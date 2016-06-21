@@ -64,6 +64,7 @@
 			  		data: {lat: latitude, lng: longitude, username: 'demo'},
 			 		async: false,
 			  		success: function(Response){
+						//alert(Response.time + " in SD");
 						alert(Response.time + " in London");
 						tiempo = Response.time[11] + Response.time[12];
 						//alert(tiempo);
