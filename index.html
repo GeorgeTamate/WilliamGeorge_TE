@@ -6,11 +6,17 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    
+
     <title>WG_VR</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//threejs.org/build/three.js"></script>
     <script src="/js/client_world.js"></script>
+    <script src="//threejs.org/build/three.js"></script>
+		<script src="/js/OrbitControls.js"></script>
+		<script src="/js/SkyShader.js"></script>
+		<script src="/js/Detector.js"></script>
+		<script src="/js/dat.gui.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"></script>
 
     <style>
 html, body {
@@ -258,7 +264,7 @@ function enterFullscreen (el) {
     socket.on('removeOtherPlayer', function(data){
         removeOtherPlayer(data);
     });
-    
+
 
 </script>
 </body>
