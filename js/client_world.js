@@ -24,7 +24,7 @@ var loadWorld = function(){
 
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
         camera.position.z = 5;
-        //camera.lookAt( new THREE.Vector3(0,0,0));
+        camera.lookAt( new THREE.Vector3(0,0,0));
 
         renderer = new THREE.WebGLRenderer( { alpha: true} );
         renderer.setSize( window.innerWidth, window.innerHeight);
@@ -165,10 +165,10 @@ var createPlayer = function(data){
 
 var updateCameraPosition = function(){
   
-    camera.position.x = player.position.x + zoom * Math.sin( player.rotation.y );
-    camera.position.y = player.position.y + zoom
-    camera.position.z = player.position.z + zoom * Math.cos( player.rotation.y );
-
+    camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y ); // + zoom;
+    camera.position.y = player.position.y + 10; // + zoom;
+    camera.position.z = player.position.z + 10 * Math.cos( player.rotation.y ); // + zoom;
+    camera.lookAt(player.position);
 };
 
 var ZoomCamera = function(param)

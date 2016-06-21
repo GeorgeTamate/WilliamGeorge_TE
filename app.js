@@ -5,7 +5,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var world = require('./js/server_world');
 
-app.get('/main', function(req, res){
+app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
@@ -14,7 +14,7 @@ app.get('/vr', function(req, res){
     res.sendFile(__dirname + '/webvr.html');
 });
 
-app.get('/', function(req, res){
+app.get('/sky', function(req, res){
     res.sendFile(__dirname + '/webgl_shaders_sky.html');
 });
 
@@ -25,8 +25,6 @@ app.get('/js/client_world.js', function(req, res){
     res.sendFile(__dirname + '/js/client_world.js');
 });
 
-//// new vars
-var ilumLevel = 1.0;
 
 io.on('connection', function(socket){
     console.log('a user connected');
