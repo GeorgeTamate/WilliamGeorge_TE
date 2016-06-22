@@ -73,6 +73,8 @@ window.onload = function() {
                     break;
                     case 76: ZoomCamera(false);
                     break;
+                    default:
+                    break;
                 }
 
             e.preventDefault();
@@ -258,7 +260,7 @@ function enterFullscreen (el) {
     socket.on('removeOtherPlayer', function(data){
         removeOtherPlayer(data);
     });
-    
+
 
 </script>
 </body>
