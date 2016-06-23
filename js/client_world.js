@@ -1,7 +1,45 @@
+
+var tiempo, ilum;
+
+function GetTime(latitude, longitude) {
+  $.ajax({
+    url: 'http://api.geonames.org/timezoneJSON',
+      data: {lat: latitude, lng: longitude, username: 'demo'},
+    async: false,
+      success: function(Response){
+      alert(Response.time + " in SD");
+      alert(Response.time + " in London");
+      tiempo = Response.time[11].concat(Response.time[12]);
+      alert(tiempo);
+      //alert(tiempo);
+      ilum = getIlum();
+    },
+    complete: function(){}
+  });
+}
+
+function getIlum() {
+  switch(tiempo) {
+
+              case "12": return 0.3; break;
+              case "11": case "13": return 0.4; break;
+              case "10": case "14": return 0.5; break;
+              case "09": case "15": return 0.6; break;
+              case "08": case "16": return 0.7; break;
+              case "07": case "17": return 0.8; break;
+              case "06": case "18": return 0.9; break;
+              case "05": case "19": return 1; break;
+              case "04": case "20": return 1.1; break;
+              case "21": case "22": case "23": case '00': case "01": case "02": case "03": return 0; break;
+              default: return 1; break;
+          }
+}
+
 var container, scene, camera, renderer, raycaster, objects = [];
 var keyState = {};
 var sphere;
 
+var sky, sunSphere;
 var player, playerId, moveSpeed, turnSpeed;
 var playerData;
 var otherPlayers = [], otherPlayersId = [];
@@ -14,6 +52,7 @@ var loadWorld = function(){
     init();
     animate();
 
+
     function init(){
 
         //Setup------------------------------------------
@@ -21,7 +60,7 @@ var loadWorld = function(){
 
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+        camera = new THREE.PerspectiveCamera(105, window.innerWidth / window.innerHeight, 0.1, 20000000);
         camera.position.z = 5;
         camera.lookAt( new THREE.Vector3(0,0,0));
 
@@ -39,6 +78,7 @@ var loadWorld = function(){
         scene.add( sphere );
         objects.push( sphere ); //if you are interested in detecting an intersection with this sphere
 
+        initSky();
         //Events------------------------------------------
         document.addEventListener('click', onMouseClick, false );
         document.addEventListener('mousedown', onMouseDown, false);
@@ -47,20 +87,81 @@ var loadWorld = function(){
         document.addEventListener('mouseout', onMouseOut, false);
         document.addEventListener('keydown', onKeyDown, false );
         document.addEventListener('keyup', onKeyUp, false );
-        
+
         document.addEventListener('key1', onKey1, false );
         document.addEventListener('key2', onKey2, false );
         document.addEventListener('key3', onKey3, false );
         document.addEventListener('key4', onKey4, false );
         document.addEventListener('key5', onKey5, false );
         document.addEventListener('key6', onKey6, false );
-        
+
         window.addEventListener( 'resize', onWindowResize, false );
 
         //Final touches-----------------------------------
         container.appendChild( renderer.domElement );
         document.body.appendChild( container );
     }
+
+    function initSky() {
+
+      // Add Sky Mesh
+      sky = new THREE.Sky();
+      scene.add( sky.mesh );
+
+      // Add Sun Helper
+      sunSphere = new THREE.Mesh(
+        new THREE.SphereBufferGeometry( 20000, 16, 8 ),
+        new THREE.MeshBasicMaterial( { color: 0xffffff } )
+      );
+      sunSphere.position.y = - 700000;
+      sunSphere.visible = false;
+      scene.add( sunSphere );
+
+      /// GUI
+
+      GetTime(51.5287718, -0.2416806);
+      var effectController  = {
+        turbidity: 10,
+        reileigh: 2,
+        mieCoefficient: 0.005,
+        mieDirectionalG: 0.8,
+        luminance: ilum,
+        inclination: 0.49, // elevation / inclination
+        azimuth: 0.25, // Facing front,
+        sun:  true
+      };
+
+      var distance = 400000;
+
+      function guiChanged() {
+
+        var uniforms = sky.uniforms;
+        uniforms.turbidity.value = effectController.turbidity;
+        uniforms.reileigh.value = effectController.reileigh;
+        uniforms.luminance.value = effectController.luminance;
+        uniforms.mieCoefficient.value = effectController.mieCoefficient;
+        uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+
+        var theta = Math.PI * ( effectController.inclination - 0.5 );
+        var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+
+        sunSphere.position.x = distance * Math.cos( phi );
+        sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
+        sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+
+        sunSphere.visible = effectController.sun;
+
+        sky.uniforms.sunPosition.value.copy( sunSphere.position );
+
+        renderer.render( scene, camera );
+
+      }
+
+
+      guiChanged();
+
+    }
+
 
     function animate(){
         requestAnimationFrame( animate );
@@ -119,14 +220,14 @@ var loadWorld = function(){
 
     }
 
-    
+
     function onKey1 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey2 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey3 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey4 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey5 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey6 ( event ){ keyState[event.keyCode || event.which] = true;}
-    
+
 
     function onWindowResize() {
 
@@ -181,7 +282,7 @@ var createPlayer = function(data){
 };
 
 var updateCameraPosition = function(){
-  
+
     camera.position.x = player.position.x + (zoom + 10) * Math.sin( player.rotation.y );
     camera.position.y = player.position.y + zoom + 7;
     camera.position.z = player.position.z + (zoom + 10) * Math.cos( player.rotation.y );
@@ -258,39 +359,39 @@ var checkKeyStates = function(){
     // CAMERA PERSPECTIVES
 
     // right 4
-    if(keyState[52]){ 
+    if(keyState[52]){
         camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y + (Math.PI/2) );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z + 10 * Math.cos( player.rotation.y + (Math.PI/2) );
-    }  
-    // left 3 
-    if(keyState[51]){ 
+    }
+    // left 3
+    if(keyState[51]){
         camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y + (Math.PI/2) );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y + (Math.PI/2) );
     }
     // up 1 eagle PoV
-    if(keyState[49]) { 
+    if(keyState[49]) {
         camera.position.x = player.position.x + Math.sin( player.rotation.y );
         camera.position.y = 20;
         camera.position.z = player.position.z + Math.cos( player.rotation.y );
-    }  
+    }
     // down 2 backward Camera
-    if(keyState[50]) { 
+    if(keyState[50]) {
         camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y );
-    } 
-    // zoom in 5 
-    if(keyState[53]) { 
+    }
+    // zoom in 5
+    if(keyState[53]) {
         if (camera.position.y > 0)
             zoom -= 0.1;
-    } 
+    }
     // zoom out 6
-    if(keyState[54]) { 
+    if(keyState[54]) {
         if (camera.position.y < 20)
             zoom += 0.1;
-    } 
+    }
 
 };
 
