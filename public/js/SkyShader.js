@@ -238,24 +238,24 @@ THREE.ShaderLib[ 'sky' ] = {
 
 };
 
-THREE.Sky = function () {
+	THREE.Sky = function () {
 
-	var skyShader = THREE.ShaderLib[ "sky" ];
-	var skyUniforms = THREE.UniformsUtils.clone( skyShader.uniforms );
+		var skyShader = THREE.ShaderLib[ "sky" ];
+		var skyUniforms = THREE.UniformsUtils.clone( skyShader.uniforms );
 
-	var skyMat = new THREE.ShaderMaterial( {
-		fragmentShader: skyShader.fragmentShader,
-		vertexShader: skyShader.vertexShader,
-		uniforms: skyUniforms,
-		side: THREE.BackSide
-	} );
+		var skyMat = new THREE.ShaderMaterial( {
+			fragmentShader: skyShader.fragmentShader,
+			vertexShader: skyShader.vertexShader,
+			uniforms: skyUniforms,
+			side: THREE.BackSide
+		} );
 
-	var skyGeo = new THREE.SphereBufferGeometry( 450000, 32, 15 );
-	var skyMesh = new THREE.Mesh( skyGeo, skyMat );
+		var skyGeo = new THREE.SphereBufferGeometry( 450000, 32, 15 );
+		var skyMesh = new THREE.Mesh( skyGeo, skyMat );
 
 
-	// Expose variables
-	this.mesh = skyMesh;
-	this.uniforms = skyUniforms;
+		// Expose variables
+		this.mesh = skyMesh;
+		this.uniforms = skyUniforms;
 
-};
+	};

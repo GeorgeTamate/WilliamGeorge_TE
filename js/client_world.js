@@ -1,4 +1,3 @@
-
 var tiempo, ilum;
 
 function GetTime(latitude, longitude) {
@@ -13,6 +12,7 @@ function GetTime(latitude, longitude) {
       alert(tiempo);
       //alert(tiempo);
       ilum = getIlum();
+
     },
     complete: function(){}
   });
@@ -40,73 +40,36 @@ var keyState = {};
 var sphere;
 
 var sky, sunSphere;
+
+var sky, sunSphere;
 var player, playerId, moveSpeed, turnSpeed;
 var playerData;
 var otherPlayers = [], otherPlayersId = [];
 
 var zoom = 0;
 
-
 var loadWorld = function(){
 
     init();
     animate();
+    function include(file)
+    {
+
+      var script  = document.createElement('script');
+      script.src  = file;
+      script.type = 'text/javascript';
+      script.defer = true;
+
+      document.getElementsByTagName('head').item(0).appendChild(script);
 
 
-    function init(){
 
-        //Setup------------------------------------------
-        container = document.getElementById('container');
-
-        scene = new THREE.Scene();
-
-        camera = new THREE.PerspectiveCamera(105, window.innerWidth / window.innerHeight, 0.1, 20000000);
-        camera.position.z = 5;
-        camera.lookAt( new THREE.Vector3(0,0,0));
-
-        renderer = new THREE.WebGLRenderer( { alpha: true} );
-        renderer.setSize( window.innerWidth, window.innerHeight);
-
-        raycaster = new THREE.Raycaster();
-        //Add Objects To the Scene HERE-------------------
-
-        //Sphere------------------
-        var sphere_geometry = new THREE.SphereGeometry(1);
-        var sphere_material = new THREE.MeshNormalMaterial();
-        sphere = new THREE.Mesh( sphere_geometry, sphere_material );
-
-        scene.add( sphere );
-        objects.push( sphere ); //if you are interested in detecting an intersection with this sphere
-
-        initSky();
-        //Events------------------------------------------
-        document.addEventListener('click', onMouseClick, false );
-        document.addEventListener('mousedown', onMouseDown, false);
-        document.addEventListener('mouseup', onMouseUp, false);
-        document.addEventListener('mousemove', onMouseMove, false);
-        document.addEventListener('mouseout', onMouseOut, false);
-        document.addEventListener('keydown', onKeyDown, false );
-        document.addEventListener('keyup', onKeyUp, false );
-
-        document.addEventListener('key1', onKey1, false );
-        document.addEventListener('key2', onKey2, false );
-        document.addEventListener('key3', onKey3, false );
-        document.addEventListener('key4', onKey4, false );
-        document.addEventListener('key5', onKey5, false );
-        document.addEventListener('key6', onKey6, false );
-
-        window.addEventListener( 'resize', onWindowResize, false );
-
-        //Final touches-----------------------------------
-        container.appendChild( renderer.domElement );
-        document.body.appendChild( container );
-    }
-
-    function initSky() {
+    function skyInit(){
 
       // Add Sky Mesh
       sky = new THREE.Sky();
       scene.add( sky.mesh );
+      //var skyshade = require('public/js/SkyShader.js');
 
       // Add Sun Helper
       sunSphere = new THREE.Mesh(
@@ -120,6 +83,7 @@ var loadWorld = function(){
       /// GUI
 
       GetTime(51.5287718, -0.2416806);
+      var ilum = getIlum();
       var effectController  = {
         turbidity: 10,
         reileigh: 2,
@@ -159,6 +123,62 @@ var loadWorld = function(){
 
 
       guiChanged();
+
+    }
+
+
+    function init(){
+
+        //Setup------------------------------------------
+        container = document.getElementById('container');
+
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera(105, window.innerWidth / window.innerHeight, 0.1, 20000000);
+        camera.position.z = 5;
+        camera.lookAt( new THREE.Vector3(0,0,0));
+
+        renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+        raycaster = new THREE.Raycaster();
+        //Add Objects To the Scene HERE-------------------
+
+        //Sphere------------------
+        var sphere_geometry = new THREE.SphereGeometry(1);
+        var sphere_material = new THREE.MeshNormalMaterial();
+        sphere = new THREE.Mesh( sphere_geometry, sphere_material );
+
+        scene.add( sphere );
+        objects.push( sphere ); //if you are interested in detecting an intersection with this sphere
+
+
+        skyInit();
+
+        //Events------------------------------------------
+        document.addEventListener('click', onMouseClick, false );
+        document.addEventListener('mousedown', onMouseDown, false);
+        document.addEventListener('mouseup', onMouseUp, false);
+        document.addEventListener('mousemove', onMouseMove, false);
+        document.addEventListener('mouseout', onMouseOut, false);
+        document.addEventListener('keydown', onKeyDown, false );
+        document.addEventListener('keyup', onKeyUp, false );
+
+        document.addEventListener('key1', onKey1, false );
+        document.addEventListener('key2', onKey2, false );
+        document.addEventListener('key3', onKey3, false );
+        document.addEventListener('key4', onKey4, false );
+        document.addEventListener('key5', onKey5, false );
+        document.addEventListener('key6', onKey6, false );
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+        //Final touches-----------------------------------
+        container.appendChild( renderer.domElement );
+        document.body.appendChild( container );
+
 
     }
 
@@ -286,6 +306,7 @@ var updateCameraPosition = function(){
     camera.position.x = player.position.x + (zoom + 10) * Math.sin( player.rotation.y );
     camera.position.y = player.position.y + zoom + 7;
     camera.position.z = player.position.z + (zoom + 10) * Math.cos( player.rotation.y );
+
     camera.lookAt(player.position);
 };
 
