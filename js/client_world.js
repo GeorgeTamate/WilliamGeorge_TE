@@ -3,11 +3,10 @@ var keyState = {};
 var sphere;
 
 var player, playerId, moveSpeed, turnSpeed;
-var zoom = 6;
 var playerData;
-
 var otherPlayers = [], otherPlayersId = [];
 
+var zoom = 0;
 
 
 var loadWorld = function(){
@@ -53,6 +52,8 @@ var loadWorld = function(){
         document.addEventListener('key2', onKey2, false );
         document.addEventListener('key3', onKey3, false );
         document.addEventListener('key4', onKey4, false );
+        document.addEventListener('key5', onKey5, false );
+        document.addEventListener('key6', onKey6, false );
         
         window.addEventListener( 'resize', onWindowResize, false );
 
@@ -123,6 +124,8 @@ var loadWorld = function(){
     function onKey2 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey3 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey4 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey5 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey6 ( event ){ keyState[event.keyCode || event.which] = true;}
     
 
     function onWindowResize() {
@@ -179,19 +182,11 @@ var createPlayer = function(data){
 
 var updateCameraPosition = function(){
   
-    camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y ); // + zoom;
-    camera.position.y = player.position.y + 7; // + zoom;
-    camera.position.z = player.position.z + 10 * Math.cos( player.rotation.y ); // + zoom;
+    camera.position.x = player.position.x + (zoom + 10) * Math.sin( player.rotation.y );
+    camera.position.y = player.position.y + zoom + 7;
+    camera.position.z = player.position.z + (zoom + 10) * Math.cos( player.rotation.y );
     camera.lookAt(player.position);
 };
-
-var ZoomCamera = function(param)
-{
-    if(param)
-        zoom += 0.5;
-    else
-        zoom -= 0.5;
-}
 
 var updatePlayerPosition = function(data){
 
@@ -260,7 +255,7 @@ var checkKeyStates = function(){
         socket.emit('updatePosition', playerData);
     }
 
-    // Camera Perspectives
+    // CAMERA PERSPECTIVES
 
     // right 4
     if(keyState[52]){ 
@@ -285,6 +280,16 @@ var checkKeyStates = function(){
         camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y );
+    } 
+    // zoom in 5 
+    if(keyState[53]) { 
+        if (camera.position.y > 0)
+            zoom -= 0.1;
+    } 
+    // zoom out 6
+    if(keyState[54]) { 
+        if (camera.position.y < 20)
+            zoom += 0.1;
     } 
 
 };
