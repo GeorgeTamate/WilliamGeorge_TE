@@ -10,6 +10,24 @@
     <title>WG_VR</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//threejs.org/build/three.js"></script>
+    
+<!-- three.js library -->
+<script src="/js/three.js"></script>
+
+<!-- VRControls.js applies the WebVR transformations to a three.js camera object. -->
+<script src="/js/VRControls.js"></script>
+
+<!-- VREffect.js handles stereo camera setup and rendering.  -->
+<script src="/js/VREffect.js"></script>
+
+<!-- A polyfill for the WebVR API.  -->
+<script src="/js/webvr-polyfill.js"></script>
+
+<script src="/js/OrbitControls.js"></script>
+<script src="/js/SkyShader.js"></script>
+<script src="/js/Detector.js"></script>
+<script src="/js/dat.gui.min.js"></script>
+
     <script src="/js/client_world.js"></script>
 
     <style>
@@ -58,49 +76,20 @@ document.addEventListener('touchmove', function(e) {
 <script>
 
 window.onload = function() {
+  keyboardInit();
+};
 
-
-            keyboardInit();
-
-        };
-
-                function keyboardInit() {
-            window.onkeydown = function(e) {
-                switch(e.keyCode) {
-
-                    //key O and L
-                    case 79: ZoomCamera(true);
-                    break;
-                    case 76: ZoomCamera(false);
-                    break;
-                }
-
-            e.preventDefault();
-            };
-
-        }
+function keyboardInit() {
+  window.onkeydown = function(e) {
+    switch(e.keyCode) {
+      default:
+      break;
+    }
+    e.preventDefault();
+  };
+}
 
 </script>
-
-
-
-
-<!-- three.js library -->
-<script src="/js/three.js"></script>
-
-<!-- VRControls.js applies the WebVR transformations to a three.js camera object. -->
-<script src="/js/VRControls.js"></script>
-
-<!-- VREffect.js handles stereo camera setup and rendering.  -->
-<script src="/js/VREffect.js"></script>
-
-<!-- A polyfill for the WebVR API.  -->
-<script src="/js/webvr-polyfill.js"></script>
-
-<script src="/js/OrbitControls.js"></script>
-<script src="/js/SkyShader.js"></script>
-<script src="/js/Detector.js"></script>
-<script src="/js/dat.gui.min.js"></script>
 
 <script>
 // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
@@ -258,7 +247,7 @@ function enterFullscreen (el) {
     socket.on('removeOtherPlayer', function(data){
         removeOtherPlayer(data);
     });
-    
+
 
 </script>
 </body>

@@ -3,11 +3,10 @@ var keyState = {};
 var sphere;
 
 var player, playerId, moveSpeed, turnSpeed;
-var zoom = 6;
 var playerData;
-
 var otherPlayers = [], otherPlayersId = [];
 
+var zoom = 0;
 
 
 var loadWorld = function(){
@@ -48,6 +47,14 @@ var loadWorld = function(){
         document.addEventListener('mouseout', onMouseOut, false);
         document.addEventListener('keydown', onKeyDown, false );
         document.addEventListener('keyup', onKeyUp, false );
+        
+        document.addEventListener('key1', onKey1, false );
+        document.addEventListener('key2', onKey2, false );
+        document.addEventListener('key3', onKey3, false );
+        document.addEventListener('key4', onKey4, false );
+        document.addEventListener('key5', onKey5, false );
+        document.addEventListener('key6', onKey6, false );
+        
         window.addEventListener( 'resize', onWindowResize, false );
 
         //Final touches-----------------------------------
@@ -111,6 +118,16 @@ var loadWorld = function(){
         keyState[event.keyCode || event.which] = false;
 
     }
+
+    
+    function onKey1 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey2 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey3 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey4 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey5 ( event ){ keyState[event.keyCode || event.which] = true;}
+    function onKey6 ( event ){ keyState[event.keyCode || event.which] = true;}
+    
+
     function onWindowResize() {
 
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -165,19 +182,11 @@ var createPlayer = function(data){
 
 var updateCameraPosition = function(){
   
-    camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y ); // + zoom;
-    camera.position.y = player.position.y + 10; // + zoom;
-    camera.position.z = player.position.z + 10 * Math.cos( player.rotation.y ); // + zoom;
+    camera.position.x = player.position.x + (zoom + 10) * Math.sin( player.rotation.y );
+    camera.position.y = player.position.y + zoom + 7;
+    camera.position.z = player.position.z + (zoom + 10) * Math.cos( player.rotation.y );
     camera.lookAt(player.position);
 };
-
-var ZoomCamera = function(param)
-{
-    if(param)
-        zoom += 0.5;
-    else
-        zoom -= 0.5;
-}
 
 var updatePlayerPosition = function(data){
 
@@ -245,6 +254,43 @@ var checkKeyStates = function(){
         updatePlayerData();
         socket.emit('updatePosition', playerData);
     }
+
+    // CAMERA PERSPECTIVES
+
+    // right 4
+    if(keyState[52]){ 
+        camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y + (Math.PI/2) );
+        camera.position.y = player.position.y + 7;
+        camera.position.z = player.position.z + 10 * Math.cos( player.rotation.y + (Math.PI/2) );
+    }  
+    // left 3 
+    if(keyState[51]){ 
+        camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y + (Math.PI/2) );
+        camera.position.y = player.position.y + 7;
+        camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y + (Math.PI/2) );
+    }
+    // up 1 eagle PoV
+    if(keyState[49]) { 
+        camera.position.x = player.position.x + Math.sin( player.rotation.y );
+        camera.position.y = 20;
+        camera.position.z = player.position.z + Math.cos( player.rotation.y );
+    }  
+    // down 2 backward Camera
+    if(keyState[50]) { 
+        camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y );
+        camera.position.y = player.position.y + 7;
+        camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y );
+    } 
+    // zoom in 5 
+    if(keyState[53]) { 
+        if (camera.position.y > 0)
+            zoom -= 0.1;
+    } 
+    // zoom out 6
+    if(keyState[54]) { 
+        if (camera.position.y < 20)
+            zoom += 0.1;
+    } 
 
 };
 
