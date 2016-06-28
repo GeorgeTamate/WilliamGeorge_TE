@@ -5,7 +5,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var world = require('./js/server_world');
 
-
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
@@ -13,6 +12,10 @@ app.get('/', function(req, res){
 
 app.get('/vr', function(req, res){
     res.sendFile(__dirname + '/webvr.html');
+});
+
+app.get('/xvr', function(req, res){
+    res.sendFile(__dirname + '/webxvr.html');
 });
 
 app.get('/sky', function(req, res){
@@ -48,6 +51,11 @@ io.on('connection', function(socket){
         var newData = world.updatePlayerData(data);
         socket.broadcast.emit('updatePosition', newData);
     });
+
+    socket.on('lookingAtCube', function(cube_num){
+        console.log(socket.id + ' is looking at Cube ' + cube_num);
+    });
+
     socket.on('disconnect', function(){
         console.log('user disconnected');
         io.emit('removeOtherPlayer', player);
