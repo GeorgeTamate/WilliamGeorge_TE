@@ -1,4 +1,5 @@
-var container, scene, camera, controls, renderer, raycaster, objects = [];
+var container, scene, camera, renderer, raycaster, objects = [];
+var vrcamera, controls, effect;
 var keyState = {};
 var sphere;
 
@@ -33,15 +34,19 @@ var loadWorld = function(){
         camera.position.z = 5;
         camera.lookAt( new THREE.Vector3(0,0,0));
 
+        vrcamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000000);
+        vrcamera.position.z = 10;
+        vrcamera.lookAt( new THREE.Vector3(0,0,0));
+
         renderer = new THREE.WebGLRenderer( { alpha: true} );
         renderer.setSize( window.innerWidth, window.innerHeight);
 
         raycaster = new THREE.Raycaster();
         //Add Objects To the Scene HERE-------------------
 
-        
+
         //Sky-----------------
-      
+
         initSky();
 
         /*
@@ -69,17 +74,72 @@ var loadWorld = function(){
         //Cubes------------------
         // Create 3D objects.
 
-        var geometry = new THREE.BoxGeometry(1, 1, 1);
+        var geometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
         var material = new THREE.MeshNormalMaterial();
+        var loader = new THREE.TextureLoader();
+        // texture arrays
+        var materialsA = [];
+        var materialsB = [];
+        var materialsC = [];
+        var materialsD = [];
+        var materialsE = [];
+        var materialsF = [];
+        // loading texture imgs and pushing them to arrays
+        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln1.jpg')} )); //LONDON
+        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln2.jpg')} ));
+        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln3.png')} ));
+        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln4.jpg')} ));
+        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln5.jpg')} ));
+        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln6.jpg')} ));
 
+        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr2.png')} )); //PARIS
+        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr5.jpg')} ));
+        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
+        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
+        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr4.jpg')} ));
+        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr6.png')} ));
+
+        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp1.jpg')} )); //TOKYO
+        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp2.jpg')} ));
+        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp3.png')} ));
+        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp4.jpg')} ));
+        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp5.jpg')} ));
+        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp6.png')} ));
+
+        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk1.jpg')} )); //TURKEY
+        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk2.jpg')} ));
+        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk3.png')} ));
+        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk4.jpg')} ));
+        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk5.jpg')} ));
+        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk6.jpg')} ));
+
+        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny1.jpg')} )); //NYC
+        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny2.jpg')} ));
+        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny3.png')} ));
+        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny4.jpg')} ));
+        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny5.jpg')} ));
+        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny6.jpg')} ));
+
+        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd4.png')} )); //SD
+        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd7.png')} ));
+        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd2.png')} ));
+        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd1.png')} ));
+        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd6.png')} ));
+        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd5.png')} ));
+
+        // applying textures to cubes
+        cubes[0] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsA ));
+        cubes[1] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsB ));
+        cubes[2] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsC ));
+        cubes[3] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsD ));
+        cubes[4] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsE ));
+        cubes[5] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsF ));
+        // positioning and adding cubes to the scene
         for (var i = 0; i < 6; i++) {
-            
-            cubes[i] = new THREE.Mesh(geometry, material);
             // Position cube mesh
             cubes[i].position.z = 5;
             cubes[i].position.y = 0.5;
             cubes[i].position.x = i * 3;
-
             // Add cube mesh to your three.js scene
             scene.add(cubes[i]);
         }
@@ -92,29 +152,31 @@ var loadWorld = function(){
         document.addEventListener('mouseout', onMouseOut, false);
         document.addEventListener('keydown', onKeyDown, false );
         document.addEventListener('keyup', onKeyUp, false );
-        
+
         document.addEventListener('key1', onKey1, false );
         document.addEventListener('key2', onKey2, false );
         document.addEventListener('key3', onKey3, false );
         document.addEventListener('key4', onKey4, false );
         document.addEventListener('key5', onKey5, false );
         document.addEventListener('key6', onKey6, false );
-        
+
         window.addEventListener( 'resize', onWindowResize, false );
 
         //Final touches-----------------------------------
         container.appendChild( renderer.domElement );
         document.body.appendChild( container );
 
-        
+
         //VR elements-----------------------------------
-        
+
         // Apply VR headset positional data to camera.
-        var controls = new THREE.VRControls(camera);
+        controls = new THREE.VRControls(vrcamera);
 
         // Apply VR stereo rendering to renderer.
-        var effect = new THREE.VREffect(renderer);
+        effect = new THREE.VREffect(renderer);
         effect.setSize(window.innerWidth, window.innerHeight);
+
+        //scene.add(vrcamera);
     }
 
     function initSky() {
@@ -137,7 +199,7 @@ var loadWorld = function(){
 
             function getIlum() {
                 switch(tiempo) {
-                    
+
                     case "12": return 0.3; break;
                     case "11": case "13": return 0.4; break;
                     case "10": case "14": return 0.5; break;
@@ -205,6 +267,7 @@ var loadWorld = function(){
             sky.uniforms.sunPosition.value.copy( sunSphere.position );
 
             renderer.render( scene, camera );
+            //renderer.render( scene, vrcamera );
         }
 
         guiChanged();
@@ -245,9 +308,17 @@ var loadWorld = function(){
             camera.lookAt( player.position );
         }
 
+        // Update VR headset position and apply to camera.
+        //controls.update();
+
+        // Render the scene.
+        //effect.render(scene, vrcamera);
+
         //Render Scene---------------------------------------
         renderer.clear();
         renderer.render( scene , camera );
+        //renderer.clear();
+        //renderer.render( scene , vrcamera );
     }
 
     function onMouseClick(){
@@ -288,19 +359,21 @@ var loadWorld = function(){
 
     }
 
-    
+
     function onKey1 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey2 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey3 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey4 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey5 ( event ){ keyState[event.keyCode || event.which] = true;}
     function onKey6 ( event ){ keyState[event.keyCode || event.which] = true;}
-    
+
 
     function onWindowResize() {
 
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
+        //vrcamera.aspect = window.innerWidth / window.innerHeight;
+        //vrcamera.updateProjectionMatrix();
         renderer.setSize( window.innerWidth, window.innerHeight );
 
     }
@@ -350,7 +423,7 @@ var createPlayer = function(data){
 };
 
 var updateCameraPosition = function(){
-  
+
     camera.position.x = player.position.x + (zoom + 10) * Math.sin( player.rotation.y );
     camera.position.y = player.position.y + zoom + 7;
     camera.position.z = player.position.z + (zoom + 10) * Math.cos( player.rotation.y );
@@ -428,39 +501,39 @@ var checkKeyStates = function(){
     // CAMERA PERSPECTIVES
 
     // right 4
-    if(keyState[52]){ 
+    if(keyState[52]){
         camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y + (Math.PI/2) );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z + 10 * Math.cos( player.rotation.y + (Math.PI/2) );
-    }  
-    // left 3 
-    if(keyState[51]){ 
+    }
+    // left 3
+    if(keyState[51]){
         camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y + (Math.PI/2) );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y + (Math.PI/2) );
     }
     // up 1 eagle PoV
-    if(keyState[49]) { 
+    if(keyState[49]) {
         camera.position.x = player.position.x + Math.sin( player.rotation.y );
         camera.position.y = 20;
         camera.position.z = player.position.z + Math.cos( player.rotation.y );
-    }  
+    }
     // down 2 backward Camera
-    if(keyState[50]) { 
+    if(keyState[50]) {
         camera.position.x = player.position.x - 10 * Math.sin( player.rotation.y );
         camera.position.y = player.position.y + 7;
         camera.position.z = player.position.z - 10 * Math.cos( player.rotation.y );
-    } 
-    // zoom in 5 
-    if(keyState[53]) { 
+    }
+    // zoom in 5
+    if(keyState[53]) {
         if (camera.position.y > 0)
             zoom -= 0.1;
-    } 
+    }
     // zoom out 6
-    if(keyState[54]) { 
+    if(keyState[54]) {
         if (camera.position.y < 20)
             zoom += 0.1;
-    } 
+    }
 
 };
 
