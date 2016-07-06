@@ -5,10 +5,16 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var world = require('./js/server_world');
 
+
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
+/*
+app.get('/', function(req, res){
+    res.sendFile(__dirname + '/tvr.html');
+});
+*/
 
 app.get('/vr', function(req, res){
     res.sendFile(__dirname + '/webvr.html');
@@ -25,9 +31,16 @@ app.get('/sky', function(req, res){
 // Add code to adjust public/static folders
 app.use(express.static('public'));
 
+
 app.get('/js/client_world.js', function(req, res){
     res.sendFile(__dirname + '/js/client_world.js');
 });
+
+/*
+app.get('/js/cw.js', function(req, res){
+    res.sendFile(__dirname + '/js/cw.js');
+});
+*/
 
 
 io.on('connection', function(socket){

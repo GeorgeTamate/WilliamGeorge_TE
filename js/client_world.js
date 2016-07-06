@@ -1,399 +1,397 @@
-var container, scene, camera, renderer, raycaster, objects = [];
-var vrcamera, controls, effect;
+var container, raycaster, objects = [];
+var renderer, scene, camera, controls, effect;
+var reticle;
+var loader;
 var keyState = {};
 var sphere;
-
-var sky, sunSphere;
 
 var plane;
 var cube;
 var cubes = [];
+var sky, sunSphere;
 
 var player, playerId, moveSpeed, turnSpeed;
 var playerData;
 var otherPlayers = [], otherPlayersId = [];
-
 var zoom = 0;
 
-var lastRender = 0;
-
+var timebuf = 0;
 
 var loadWorld = function(){
 
-    init();
-    animate();
+  //----------------------------------------------------------//
+  //---------------------- INITIALIZING ----------------------//
+  //----------------------------------------------------------//
 
-    function init(){
+  //Scene Elements------------------
+  // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
+  // Only enable it if you actually need to.
+  renderer = new THREE.WebGLRenderer({antialias: false});
+  renderer.setPixelRatio(Math.floor(window.devicePixelRatio));
+  // Append the canvas element created by the renderer to document body element.
+  document.body.appendChild(renderer.domElement);
+  // Create a three.js scene.
+  scene = new THREE.Scene();
+  // Create a three.js camera.
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000000);
+  // Apply VR headset positional data to camera.
+  controls = new THREE.VRControls(camera);
+  // Apply VR stereo rendering to renderer.
+  effect = new THREE.VREffect(renderer);
+  effect.setSize(window.innerWidth, window.innerHeight);
+  // img loader
+  loader = new THREE.TextureLoader();
+  // reticle
+  reticle = vreticle.Reticle(camera);
+  scene.add(camera);
 
-        //Setup------------------------------------------
-        container = document.getElementById('container');
+  //Sky--------------------
+  initSky();
 
-        scene = new THREE.Scene();
+  //Plane------------------
+  var planeGeometry = new THREE.PlaneGeometry(40,40);
+  var planeMaterial = new THREE.MeshBasicMaterial({color: 0x904C3E, side: THREE.DoubleSide});
+  plane = new THREE.Mesh(planeGeometry,planeMaterial);
+  // rotate and position the plane
+  plane.rotation.x=-0.5*Math.PI;
+  plane.position.x=15
+  plane.position.y=-0.5
+  plane.position.z=0
+  // add the plane to the scene
+  scene.add(plane);
 
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000000);
-        camera.position.z = 5;
-        camera.lookAt( new THREE.Vector3(0,0,0));
+  //Cubes------------------
+  // Create 3D objects.
+  var geometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
+  //var material = new THREE.MeshNormalMaterial();
 
-        vrcamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000000);
-        vrcamera.position.z = 10;
-        vrcamera.lookAt( new THREE.Vector3(0,0,0));
+  // texture arrays
+  var materialsA = [];
+  var materialsB = [];
+  var materialsC = [];
+  var materialsD = [];
+  var materialsE = [];
+  var materialsF = [];
 
-        renderer = new THREE.WebGLRenderer( { alpha: true} );
-        renderer.setSize( window.innerWidth, window.innerHeight);
+  // loading texture imgs and pushing them to arrays
+  materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln1.jpg')} )); //LONDON
+  materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln2.jpg')} ));
+  materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln3.png')} ));
+  materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln4.jpg')} ));
+  materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln5.jpg')} ));
+  materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln6.jpg')} ));
 
-        raycaster = new THREE.Raycaster();
-        //Add Objects To the Scene HERE-------------------
+  materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr2.png')} )); //PARIS
+  materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr5.jpg')} ));
+  materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
+  materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
+  materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr4.jpg')} ));
+  materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr6.png')} ));
 
+  materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp1.jpg')} )); //TOKYO
+  materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp2.jpg')} ));
+  materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp3.png')} ));
+  materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp4.jpg')} ));
+  materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp5.jpg')} ));
+  materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp6.png')} ));
 
-        //Sky-----------------
+  materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk1.jpg')} )); //TURKEY
+  materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk2.jpg')} ));
+  materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk3.png')} ));
+  materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk4.jpg')} ));
+  materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk5.jpg')} ));
+  materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk6.jpg')} ));
 
-        initSky();
+  materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny1.jpg')} )); //NYC
+  materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny2.jpg')} ));
+  materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny3.png')} ));
+  materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny4.jpg')} ));
+  materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny5.jpg')} ));
+  materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny6.jpg')} ));
 
-        /*
-        //Sphere------------------
-        var sphere_geometry = new THREE.SphereGeometry(1);
-        var sphere_material = new THREE.MeshNormalMaterial();
-        sphere = new THREE.Mesh( sphere_geometry, sphere_material );
+  materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd4.png')} )); //SD
+  materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd7.png')} ));
+  materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd2.png')} ));
+  materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd1.png')} ));
+  materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd6.png')} ));
+  materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd5.png')} ));
 
-        scene.add( sphere );
-        objects.push( sphere ); //if you are interested in detecting an intersection with this sphere
-        */
-
-        //Plane------------------
-        var planeGeometry = new THREE.PlaneGeometry(40,40);
-        var planeMaterial = new THREE.MeshBasicMaterial({color: 0x904C3E, side: THREE.DoubleSide});
-        plane = new THREE.Mesh(planeGeometry,planeMaterial);
-        // rotate and position the plane
-        plane.rotation.x=-0.5*Math.PI;
-        plane.position.x=15
-        plane.position.y=-0.5
-        plane.position.z=0
-        // add the plane to the scene
-        scene.add(plane);
-
-        //Cubes------------------
-        // Create 3D objects.
-
-        var geometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
-        var material = new THREE.MeshNormalMaterial();
-        var loader = new THREE.TextureLoader();
-        // texture arrays
-        var materialsA = [];
-        var materialsB = [];
-        var materialsC = [];
-        var materialsD = [];
-        var materialsE = [];
-        var materialsF = [];
-        // loading texture imgs and pushing them to arrays
-        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln1.jpg')} )); //LONDON
-        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln2.jpg')} ));
-        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln3.png')} ));
-        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln4.jpg')} ));
-        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln5.jpg')} ));
-        materialsA.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln6.jpg')} ));
-
-        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr2.png')} )); //PARIS
-        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr5.jpg')} ));
-        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
-        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
-        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr4.jpg')} ));
-        materialsB.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr6.png')} ));
-
-        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp1.jpg')} )); //TOKYO
-        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp2.jpg')} ));
-        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp3.png')} ));
-        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp4.jpg')} ));
-        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp5.jpg')} ));
-        materialsC.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp6.png')} ));
-
-        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk1.jpg')} )); //TURKEY
-        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk2.jpg')} ));
-        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk3.png')} ));
-        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk4.jpg')} ));
-        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk5.jpg')} ));
-        materialsD.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk6.jpg')} ));
-
-        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny1.jpg')} )); //NYC
-        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny2.jpg')} ));
-        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny3.png')} ));
-        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny4.jpg')} ));
-        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny5.jpg')} ));
-        materialsE.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny6.jpg')} ));
-
-        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd4.png')} )); //SD
-        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd7.png')} ));
-        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd2.png')} ));
-        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd1.png')} ));
-        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd6.png')} ));
-        materialsF.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd5.png')} ));
-
-        // applying textures to cubes
-        cubes[0] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsA ));
-        cubes[1] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsB ));
-        cubes[2] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsC ));
-        cubes[3] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsD ));
-        cubes[4] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsE ));
-        cubes[5] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsF ));
-        // positioning and adding cubes to the scene
-        for (var i = 0; i < 6; i++) {
-            // Position cube mesh
-            cubes[i].position.z = 5;
-            cubes[i].position.y = 0.5;
-            cubes[i].position.x = i * 3;
-            // Add cube mesh to your three.js scene
-            scene.add(cubes[i]);
-        }
-
-        //Events------------------------------------------
-        document.addEventListener('click', onMouseClick, false );
-        document.addEventListener('mousedown', onMouseDown, false);
-        document.addEventListener('mouseup', onMouseUp, false);
-        document.addEventListener('mousemove', onMouseMove, false);
-        document.addEventListener('mouseout', onMouseOut, false);
-        document.addEventListener('keydown', onKeyDown, false );
-        document.addEventListener('keyup', onKeyUp, false );
-
-        document.addEventListener('key1', onKey1, false );
-        document.addEventListener('key2', onKey2, false );
-        document.addEventListener('key3', onKey3, false );
-        document.addEventListener('key4', onKey4, false );
-        document.addEventListener('key5', onKey5, false );
-        document.addEventListener('key6', onKey6, false );
-
-        window.addEventListener( 'resize', onWindowResize, false );
-
-        //Final touches-----------------------------------
-        container.appendChild( renderer.domElement );
-        document.body.appendChild( container );
+  // applying textures to cubes
+  cubes[0] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsA ));
+  cubes[1] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsB ));
+  cubes[2] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsC ));
+  cubes[3] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsD ));
+  cubes[4] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsE ));
+  cubes[5] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materialsF ));
 
 
-        //VR elements-----------------------------------
+  /*
+  // reticle event handler functions for cubes
+  cubes[i].ongazelong = function(){
+    //this.material = reticle.get_random_hex_material();
+      if(timebuf < 3) {
+          timebuf++;
+      } else {
+          socket.emit('lookingAtCube', cityCubes[this]);
+          timebuf = 0;
+      }
+  }
+  cubes[i].ongazeover = function(){
+    //this.material = reticle.get_random_hex_material();
+  }
+  cubes[i].ongazeout = function(){
+    //this.material = reticle.default_material();
+    timebuf = 0;
+  }
+  */
 
-        // Apply VR headset positional data to camera.
-        controls = new THREE.VRControls(vrcamera);
+  cubes[0].ongazelong = function(){
+      if(timebuf < 3) {timebuf++;}
+      else {socket.emit('lookingAtCube', 'London'); timebuf = 0;}}
+  cubes[0].ongazeover = function(){}
+  cubes[0].ongazeout = function(){timebuf = 0;}
 
-        // Apply VR stereo rendering to renderer.
-        effect = new THREE.VREffect(renderer);
-        effect.setSize(window.innerWidth, window.innerHeight);
+  cubes[1].ongazelong = function(){
+      if(timebuf < 3) {timebuf++;}
+      else {socket.emit('lookingAtCube', 'Paris'); timebuf = 0;}}
+  cubes[1].ongazeover = function(){}
+  cubes[1].ongazeout = function(){timebuf = 0;}
 
-        //scene.add(vrcamera);
+  cubes[2].ongazelong = function(){
+      if(timebuf < 3) {timebuf++;}
+      else {socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;}}
+  cubes[2].ongazeover = function(){}
+  cubes[2].ongazeout = function(){timebuf = 0;}
+
+  cubes[3].ongazelong = function(){
+      if(timebuf < 3) {timebuf++;}
+      else {socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;}}
+  cubes[3].ongazeover = function(){}
+  cubes[3].ongazeout = function(){timebuf = 0;}
+
+  cubes[4].ongazelong = function(){
+      if(timebuf < 3) {timebuf++;}
+      else {socket.emit('lookingAtCube', 'NYC'); timebuf = 0;}}
+  cubes[4].ongazeover = function(){}
+  cubes[4].ongazeout = function(){timebuf = 0;}
+
+  cubes[5].ongazelong = function(){
+      if(timebuf < 3) {timebuf++;}
+      else {socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;}}
+  cubes[5].ongazeover = function(){}
+  cubes[5].ongazeout = function(){timebuf = 0;}
+
+  // positioning and adding cubes to the scene
+  for (var i = 0; i < 6; i++) {
+      // Adding cube to reticle collider list
+      reticle.add_collider(cubes[i]);
+      // Position cube mesh
+      cubes[i].position.z = 5;
+      cubes[i].position.y = 0.5;
+      cubes[i].position.x = i * 3;
+
+      // Add cube mesh to your three.js scene
+      scene.add(cubes[i]);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  function initSky() {
+
+          var tiempo;
+          function GetTime(latitude, longitude) {
+              $.ajax({
+                  url: 'http://api.geonames.org/timezoneJSON',
+                  data: {lat: latitude, lng: longitude, username: 'demo'},
+                  async: false,
+                  success: function(Response){
+                      //alert(Response.time + " in SD");
+                      //alert(Response.time + " in London");
+                      tiempo = Response.time[11] + Response.time[12];
+                      //alert(tiempo);
+                  },
+                  complete: function(){}
+              });
+          }
+
+          function getIlum() {
+              switch(tiempo) {
+
+                  case "12": return 0.3; break;
+                  case "11": case "13": return 0.4; break;
+                  case "10": case "14": return 0.5; break;
+                  case "09": case "15": return 0.6; break;
+                  case "08": case "16": return 0.7; break;
+                  case "07": case "17": return 0.8; break;
+                  case "06": case "18": return 0.9; break;
+                  case "05": case "19": return 1; break;
+                  case "04": case "20": return 1.1; break;
+                  case "21": case "22": case "23": case '00': case "01": case "02": case "03": return 0; break;
+                  default: return 1; break;
+              }
+          }
+
+      // Add Sky Mesh
+      sky = new THREE.Sky();
+      scene.add( sky.mesh );
+
+      // Add Sun Helper
+      sunSphere = new THREE.Mesh(
+                      new THREE.SphereBufferGeometry( 20000, 16, 8 ),
+                      new THREE.MeshBasicMaterial( { color: 0xffffff } )
+                  );
+      sunSphere.position.y = - 700000;
+      sunSphere.visible = false;
+      scene.add( sunSphere );
+
+      // GUI
+
+      //GetTime(18.4709562, -69.9336103);// SD
+      //GetTime(51.5287718, -0.2416806);// London
+      GetTime(51.5287718, -0.2416806);
+      var ilum = getIlum();
+      var effectController  = {
+                  turbidity: 10,
+                  reileigh: 2,
+                  mieCoefficient: 0.005,
+                  mieDirectionalG: 0.8,
+                  luminance: ilum,
+                  inclination: 0.49, // elevation / inclination
+                  azimuth: 0.25, // Facing front,
+                  sun:  true
+              };
+
+      var distance = 400000;
+
+      function guiChanged() {
+
+          var uniforms = sky.uniforms;
+          uniforms.turbidity.value = effectController.turbidity;
+          uniforms.reileigh.value = effectController.reileigh;
+          uniforms.luminance.value = effectController.luminance;
+          uniforms.mieCoefficient.value = effectController.mieCoefficient;
+          uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+
+          var theta = Math.PI * ( effectController.inclination - 0.5 );
+          var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+
+          sunSphere.position.x = distance * Math.cos( phi );
+          sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
+          sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+
+          sunSphere.visible = effectController.sun;
+
+          sky.uniforms.sunPosition.value.copy( sunSphere.position );
+
+          renderer.render( scene, camera );
+
+      }
+
+      guiChanged();
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//---------------------------------------------------------------------//
+//---------------------- ANIMATION AND RENDERING ----------------------//
+//---------------------------------------------------------------------//
+
+  // Get the VRDisplay and save it for later.
+  var vrDisplay = null;
+  navigator.getVRDisplays().then(function(displays) {
+    if (displays.length > 0) {
+      vrDisplay = displays[0];
+    }
+  });
+
+  // Request animation frame loop function
+  function animate() {
+
+    // Apply rotation to cube mesh
+    for (var cube_index = 0; cube_index < 6; cube_index++) {
+        cubes[cube_index].rotation.y += 0.02; //* (cube_index+1);
     }
 
-    function initSky() {
+    // Update VR headset position and apply to camera.
+    controls.update();
 
-            var tiempo;
-            function GetTime(latitude, longitude) {
-                $.ajax({
-                    url: 'http://api.geonames.org/timezoneJSON',
-                    data: {lat: latitude, lng: longitude, username: 'demo'},
-                    async: false,
-                    success: function(Response){
-                        //alert(Response.time + " in SD");
-                        //alert(Response.time + " in London");
-                        tiempo = Response.time[11] + Response.time[12];
-                        //alert(tiempo);
-                    },
-                    complete: function(){}
-                });
-            }
+    // Render the scene.
+    effect.render(scene, camera);
 
-            function getIlum() {
-                switch(tiempo) {
+    //reticle_loop
+    reticle.reticle_loop();
 
-                    case "12": return 0.3; break;
-                    case "11": case "13": return 0.4; break;
-                    case "10": case "14": return 0.5; break;
-                    case "09": case "15": return 0.6; break;
-                    case "08": case "16": return 0.7; break;
-                    case "07": case "17": return 0.8; break;
-                    case "06": case "18": return 0.9; break;
-                    case "05": case "19": return 1; break;
-                    case "04": case "20": return 1.1; break;
-                    case "21": case "22": case "23": case '00': case "01": case "02": case "03": return 0; break;
-                    default: return 1; break;
-                }
-            }
+    // Keep looping.
+    requestAnimationFrame(animate);
+  }
 
-        // Add Sky Mesh
-        sky = new THREE.Sky();
-        scene.add( sky.mesh );
+  function onResize() {
+    console.log('Resizing to %s x %s.', window.innerWidth, window.innerHeight);
+    effect.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  }
 
-        // Add Sun Helper
-        sunSphere = new THREE.Mesh(
-                        new THREE.SphereBufferGeometry( 20000, 16, 8 ),
-                        new THREE.MeshBasicMaterial( { color: 0xffffff } )
-                    );
-        sunSphere.position.y = - 700000;
-        sunSphere.visible = false;
-        scene.add( sunSphere );
+  function onVRDisplayPresentChange() {
+    console.log('onVRDisplayPresentChange');
+    onResize();
+  }
 
-        // GUI
+  // Kick off animation loop.
+  requestAnimationFrame(animate);
 
-        //GetTime(18.4709562, -69.9336103);// SD
-        //GetTime(51.5287718, -0.2416806);// London
-        GetTime(51.5287718, -0.2416806);
-        var ilum = getIlum();
-        var effectController  = {
-                    turbidity: 10,
-                    reileigh: 2,
-                    mieCoefficient: 0.005,
-                    mieDirectionalG: 0.8,
-                    luminance: ilum,
-                    inclination: 0.49, // elevation / inclination
-                    azimuth: 0.25, // Facing front,
-                    sun:  true
-                };
+  // Resize the WebGL canvas when we resize and also when we change modes.
+  window.addEventListener('resize', onResize);
+  window.addEventListener('vrdisplaypresentchange', onVRDisplayPresentChange);
 
-        var distance = 400000;
+  // Button click handlers.
+  document.querySelector('button#fullscreen').addEventListener('click', function() {
+    enterFullscreen(renderer.domElement);
+  });
+  document.querySelector('button#vr').addEventListener('click', function() {
+    vrDisplay.requestPresent([{source: renderer.domElement}]);
+  });
+  document.querySelector('button#reset').addEventListener('click', function() {
+    vrDisplay.resetPose();
+  });
 
-        function guiChanged() {
-
-            var uniforms = sky.uniforms;
-            uniforms.turbidity.value = effectController.turbidity;
-            uniforms.reileigh.value = effectController.reileigh;
-            uniforms.luminance.value = effectController.luminance;
-            uniforms.mieCoefficient.value = effectController.mieCoefficient;
-            uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
-
-            var theta = Math.PI * ( effectController.inclination - 0.5 );
-            var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
-
-            sunSphere.position.x = distance * Math.cos( phi );
-            sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-            sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
-
-            sunSphere.visible = effectController.sun;
-
-            sky.uniforms.sunPosition.value.copy( sunSphere.position );
-
-            renderer.render( scene, camera );
-            //renderer.render( scene, vrcamera );
-        }
-
-        guiChanged();
+  function enterFullscreen (el) {
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.mozRequestFullScreen) {
+      el.mozRequestFullScreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
     }
-
-    /*
-    function animate(timestamp){
-        var delta = Math.min(timestamp - lastRender, 500);
-        lastRender = timestamp;
-
-        // Apply rotation to cube mesh
-        cubes[2].rotation.y += 0.02;
-
-        render();
-        requestAnimationFrame( animate );
-    }
-    */
-
-    function animate(){
-
-        // Apply rotation to cube mesh
-        for (var cube_index = 0; cube_index < 6; cube_index++) {
-            cubes[cube_index].rotation.y += 0.02; //* (cube_index+1);
-        }
-
-        render();
-        requestAnimationFrame( animate );
-    }
-
-    function render(){
-
-        if ( player ){
-
-            updateCameraPosition();
-
-            checkKeyStates();
-
-            camera.lookAt( player.position );
-        }
-
-        // Update VR headset position and apply to camera.
-        //controls.update();
-
-        // Render the scene.
-        //effect.render(scene, vrcamera);
-
-        //Render Scene---------------------------------------
-        renderer.clear();
-        renderer.render( scene , camera );
-        //renderer.clear();
-        //renderer.render( scene , vrcamera );
-    }
-
-    function onMouseClick(){
-        intersects = calculateIntersects( event );
-
-        if ( intersects.length > 0 ){
-            //If object is intersected by mouse pointer, do something
-            if (intersects[0].object == sphere){
-                alert("This is a sphere!");
-            }
-        }
-    }
-    function onMouseDown(){
-
-    }
-    function onMouseUp(){
-
-    }
-    function onMouseMove(){
-
-    }
-    function onMouseOut(){
-
-    }
-    function onKeyDown( event ){
-
-        //event = event || window.event;
-
-        keyState[event.keyCode || event.which] = true;
-
-    }
-
-    function onKeyUp( event ){
-
-        //event = event || window.event;
-
-        keyState[event.keyCode || event.which] = false;
-
-    }
-
-
-    function onKey1 ( event ){ keyState[event.keyCode || event.which] = true;}
-    function onKey2 ( event ){ keyState[event.keyCode || event.which] = true;}
-    function onKey3 ( event ){ keyState[event.keyCode || event.which] = true;}
-    function onKey4 ( event ){ keyState[event.keyCode || event.which] = true;}
-    function onKey5 ( event ){ keyState[event.keyCode || event.which] = true;}
-    function onKey6 ( event ){ keyState[event.keyCode || event.which] = true;}
-
-
-    function onWindowResize() {
-
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        //vrcamera.aspect = window.innerWidth / window.innerHeight;
-        //vrcamera.updateProjectionMatrix();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-
-    }
-    function calculateIntersects( event ){
-
-        //Determine objects intersected by raycaster
-        event.preventDefault();
-
-        var vector = new THREE.Vector3();
-        vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-        vector.unproject( camera );
-
-        raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-        var intersects = raycaster.intersectObjects( objects );
-
-        return intersects;
-    }
+  }
 
 };
+
 
 var createPlayer = function(data){
 
@@ -419,15 +417,17 @@ var createPlayer = function(data){
     objects.push( player );
     scene.add( player );
 
-    camera.lookAt( player.position );
+
 };
 
 var updateCameraPosition = function(){
 
+    /*
     camera.position.x = player.position.x + (zoom + 10) * Math.sin( player.rotation.y );
     camera.position.y = player.position.y + zoom + 7;
     camera.position.z = player.position.z + (zoom + 10) * Math.cos( player.rotation.y );
     camera.lookAt(player.position);
+    */
 };
 
 var updatePlayerPosition = function(data){
@@ -501,6 +501,7 @@ var checkKeyStates = function(){
     // CAMERA PERSPECTIVES
 
     // right 4
+    /*
     if(keyState[52]){
         camera.position.x = player.position.x + 10 * Math.sin( player.rotation.y + (Math.PI/2) );
         camera.position.y = player.position.y + 7;
@@ -534,6 +535,7 @@ var checkKeyStates = function(){
         if (camera.position.y < 20)
             zoom += 0.1;
     }
+    */
 
 };
 
