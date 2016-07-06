@@ -1,18 +1,40 @@
 <!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-<html lang="en">
-<head>
-<title>Web VR Polyfill - basic example</title>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<style>
+    <title>Web VR Polyfill - basic example</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//threejs.org/build/three.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"></script>
+
+    <!-- three.js library -->
+    <script src="/js/three.js"></script>
+
+    <!-- VRControls.js applies the WebVR transformations to a three.js camera object. -->
+    <script src="/js/VRControls.js"></script>
+
+    <!-- VREffect.js handles stereo camera setup and rendering.  -->
+    <script src="/js/VREffect.js"></script>
+
+    <!-- A polyfill for the WebVR API.  -->
+    <script src="/js/webvr-polyfill.js"></script>
+
+    <script src="/js/OrbitControls.js"></script>
+    <script src="/js/SkyShader.js"></script>
+    <script src="/js/Detector.js"></script>
+    <script src="/js/dat.gui.min.js"></script>
+
+    <script src="/js/cw.js"></script>
+
+    <style>
 html, body {
   width: 100%;
   height: 100%;
-  background-color: #000;
   color: #fff;
   margin: 0px;
   padding: 0;
@@ -20,7 +42,7 @@ html, body {
 }
 
 canvas {
-  position: absolute;
+  position: fixed;
   top: 0;
 }
 
@@ -33,16 +55,14 @@ canvas {
 }
 </style>
 </head>
-
 <body>
 
-  <div id="buttons">
-    <button id="fullscreen">Fullscreen</button>
-    <button id="vr">VR (WebVR/Mobile only)</button>
-    <button id="reset">Reset</button>
-  </div>
-
-</body>
+<div id="container"></div>
+<div id="buttons">
+  <button id="fullscreen">Fullscreen</button>
+  <button id="vr">VR (WebVR/Mobile only)</button>
+  <button id="reset">Reset</button>
+</div>
 
 <script>
 WebVRConfig = {
@@ -54,20 +74,27 @@ document.addEventListener('touchmove', function(e) {
 });
 </script>
 
-<!-- three.js library -->
-<script src="/js/three.js"></script>
+<script>
 
-<!-- VRControls.js applies the WebVR transformations to a three.js camera object. -->
-<script src="/js/VRControls.js"></script>
+window.onload = function() {
+  keyboardInit();
+};
 
-<!-- VREffect.js handles stereo camera setup and rendering.  -->
-<script src="/js/VREffect.js"></script>
+function keyboardInit() {
+  window.onkeydown = function(e) {
+    switch(e.keyCode) {
+      default:
+      break;
+    }
+    e.preventDefault();
+  };
+}
 
-<!-- A polyfill for the WebVR API.  -->
-<script src="/js/webvr-polyfill.js"></script>
-
+</script>
 
 <script>
+
+/*
 // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
 // Only enable it if you actually need to.
 var renderer = new THREE.WebGLRenderer({antialias: false});
@@ -89,11 +116,29 @@ var controls = new THREE.VRControls(camera);
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
 
+*/
+
+
+
+
+
+
+
+
+/*
 
 // Add a repeating grid as a skybox.
 var boxWidth = 5;
 var loader = new THREE.TextureLoader();
-loader.load('img/box.png', onTextureLoaded);
+loader.load("/img/box.png", onTextureLoaded);
+
+*/
+
+
+
+
+
+
 
 // Get the VRDisplay and save it for later.
 var vrDisplay = null;
@@ -102,6 +147,16 @@ navigator.getVRDisplays().then(function(displays) {
     vrDisplay = displays[0];
   }
 });
+
+
+
+
+
+
+
+
+
+/*
 
 function onTextureLoaded(texture) {
   texture.wrapS = THREE.RepeatWrapping;
@@ -116,7 +171,12 @@ function onTextureLoaded(texture) {
   });
 
   var skybox = new THREE.Mesh(geometry, material);
-  scene.add(skybox);
+
+  //scene.add(skybox);
+
+  sky = new THREE.Sky();
+  scene.add( sky.mesh );
+
 }
 
 // Create 3D objects.
@@ -130,14 +190,26 @@ cube.position.z = -1;
 // Add cube mesh to your three.js scene
 scene.add(cube);
 
+*/
+
+
+
+
+
+
+
+
+
+/*
+
 // Request animation frame loop function
 var lastRender = 0;
 function animate(timestamp) {
-  var delta = Math.min(timestamp - lastRender, 500);
+  //var delta = Math.min(timestamp - lastRender, 500);
   lastRender = timestamp;
 
   // Apply rotation to cube mesh
-  cube.rotation.y += delta * 0.0006;
+  //cube.rotation.y += delta * 0.0006;
 
   // Update VR headset position and apply to camera.
   controls.update();
@@ -149,11 +221,19 @@ function animate(timestamp) {
   requestAnimationFrame(animate);
 }
 
+
+*/
+
+
+
+
+
+
 function onResize() {
   console.log('Resizing to %s x %s.', window.innerWidth, window.innerHeight);
-  effect.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  //effect.setSize(window.innerWidth, window.innerHeight);
+  //camera.aspect = window.innerWidth / window.innerHeight;
+  //camera.updateProjectionMatrix();
 }
 
 function onVRDisplayPresentChange() {
@@ -161,8 +241,22 @@ function onVRDisplayPresentChange() {
   onResize();
 }
 
+
+
+/*
+
+
 // Kick off animation loop.
 requestAnimationFrame(animate);
+
+
+*/
+
+
+
+
+
+
 
 // Resize the WebGL canvas when we resize and also when we change modes.
 window.addEventListener('resize', onResize);
@@ -191,6 +285,27 @@ function enterFullscreen (el) {
   }
 }
 
-</script>
+    // Reactions...
+    var socket = io();
 
+    socket.on('updatePosition', function(data){
+        updatePlayerPosition(data);
+    });
+    socket.on('connect', function(){
+        loadWorld();
+        socket.emit('requestOldPlayers', {});
+    });
+    socket.on('createPlayer', function(data){
+        createPlayer(data);
+    });
+    socket.on('addOtherPlayer', function(data){
+        addOtherPlayer(data);
+    });
+    socket.on('removeOtherPlayer', function(data){
+        removeOtherPlayer(data);
+    });
+
+
+</script>
+</body>
 </html>
