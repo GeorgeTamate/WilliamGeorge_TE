@@ -65,8 +65,8 @@ io.on('connection', function(socket){
         socket.broadcast.emit('updatePosition', newData);
     });
 
-    socket.on('lookingAtCube', function(cube_num){
-        console.log(socket.id + ' is looking at Cube ' + cube_num);
+    socket.on('lookingAtCube', function(cube_name){
+        console.log(socket.id + ' is looking at ' + cube_name);
     });
 
     socket.on('disconnect', function(){

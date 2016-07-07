@@ -58,7 +58,7 @@ THREE.VRControls = function ( object, onError ) {
 	// standing=true but the VRDisplay doesn't provide stageParameters.
 	this.userHeight = 1.6;
 
-	this.update = function () {
+	this.update = function (cx, cy, cz) {
 
 		if ( vrInput ) {
 
@@ -78,7 +78,7 @@ THREE.VRControls = function ( object, onError ) {
 
 				} else {
 
-					object.position.set( 0, 3, 0 );
+					object.position.set( cx, cy, cz );
 
 				}
 
@@ -99,7 +99,7 @@ THREE.VRControls = function ( object, onError ) {
 
 				} else {
 
-					object.position.set( 0, 3, 0 );
+					object.position.set( cx, cy, cz );
 
 				}
 
