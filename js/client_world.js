@@ -29,15 +29,8 @@ var sphere;
 
 // City Cubes------------------
 var cube;
-var cubes = [];
 var londonCube, parisCube, tokyoCube, turkeyCube, nycCube, sdCube;
-  // city cube materials
-var londonFaceMaterial = [];
-var parisFaceMaterial = [];
-var tokyoFaceMaterial = [];
-var turkeyFaceMaterial = [];
-var nycFaceMaterial = [];
-var sdFaceMaterial = [];
+var cube1, cube2, cube3, cube4, cube5, cube6;
 
 // Players------------------
 var player, playerId, moveSpeed, turnSpeed;
@@ -45,8 +38,9 @@ var playerData;
 var otherPlayers = [], otherPlayersId = [];
 
 
-
+// Works as the main() in client_world.
 var loadWorld = function(){
+
   //----------------------------------------------------------//
   //---------------------- INITIALIZING ----------------------//
   //----------------------------------------------------------//
@@ -89,317 +83,18 @@ var loadWorld = function(){
   scene.add(plane);
 
   //Cubes------------------
-  var geometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
-
-  // loading texture imgs and pushing them to arrays
-  londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln1.jpg')} )); //LONDON
-  londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln2.jpg')} ));
-  londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln3.png')} ));
-  londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln4.jpg')} ));
-  londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln5.jpg')} ));
-  londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln6.jpg')} ));
-
-  parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr2.png')} )); //PARIS
-  parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr5.jpg')} ));
-  parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
-  parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
-  parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr4.jpg')} ));
-  parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr6.png')} ));
-
-  tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp1.jpg')} )); //TOKYO
-  tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp2.jpg')} ));
-  tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp3.png')} ));
-  tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp4.jpg')} ));
-  tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp5.jpg')} ));
-  tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp6.png')} ));
-
-  turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk1.jpg')} )); //TURKEY
-  turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk2.jpg')} ));
-  turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk3.png')} ));
-  turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk4.jpg')} ));
-  turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk5.jpg')} ));
-  turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk6.jpg')} ));
-
-  nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny1.jpg')} )); //NYC
-  nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny2.jpg')} ));
-  nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny3.png')} ));
-  nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny4.jpg')} ));
-  nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny5.jpg')} ));
-  nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny6.jpg')} ));
-
-  sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd4.png')} )); //SD
-  sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd7.png')} ));
-  sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd2.png')} ));
-  sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd1.png')} ));
-  sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd6.png')} ));
-  sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd5.png')} ));
-
-  // applying textures to cubes
-  cubes[0] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( londonFaceMaterial ));
-  cubes[1] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( parisFaceMaterial ));
-  cubes[2] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( tokyoFaceMaterial ));
-  cubes[3] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( turkeyFaceMaterial ));
-  cubes[4] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( nycFaceMaterial ));
-  cubes[5] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( sdFaceMaterial ));
-
-  londonCube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( londonFaceMaterial ));
-  parisCube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( parisFaceMaterial));
-  tokyoCube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( tokyoFaceMaterial ));
-  turkeyCube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( turkeyFaceMaterial ));
-  nycCube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( nycFaceMaterial ));
-  sdCube = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( sdFaceMaterial ));
-
-
-  cubes[0].ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'London'); timebuf = 0;
-        flyTo('London');
-      }}
-  cubes[0].ongazeover = function(){}
-  cubes[0].ongazeout = function(){timebuf = 0;}
-
-  cubes[1].ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
-        flyTo('Paris');
-      }}
-  cubes[1].ongazeover = function(){}
-  cubes[1].ongazeout = function(){timebuf = 0;}
-
-  cubes[2].ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
-        flyTo('Tokyo');
-      }}
-  cubes[2].ongazeover = function(){}
-  cubes[2].ongazeout = function(){timebuf = 0;}
-
-  cubes[3].ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
-        flyTo('Turkey');
-      }}
-  cubes[3].ongazeover = function(){}
-  cubes[3].ongazeout = function(){timebuf = 0;}
-
-  cubes[4].ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
-        flyTo('NYC');
-      }}
-  cubes[4].ongazeover = function(){}
-  cubes[4].ongazeout = function(){timebuf = 0;}
-
-  cubes[5].ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
-        flyTo('SD');
-      }}
-  cubes[5].ongazeover = function(){}
-  cubes[5].ongazeout = function(){timebuf = 0;}
-
-  londonCube.ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'London'); timebuf = 0;
-        flyTo('Home');
-      }}
-  londonCube.ongazeover = function(){}
-  londonCube.ongazeout = function(){timebuf = 0;}
-
-  parisCube.ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
-        flyTo('Home');
-      }}
-  parisCube.ongazeover = function(){}
-  parisCube.ongazeout = function(){timebuf = 0;}
-
-  tokyoCube.ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
-        flyTo('Home');
-      }}
-  tokyoCube.ongazeover = function(){}
-  tokyoCube.ongazeout = function(){timebuf = 0;}
-
-  turkeyCube.ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
-        flyTo('Home');
-      }}
-  turkeyCube.ongazeover = function(){}
-  turkeyCube.ongazeout = function(){timebuf = 0;}
-
-  nycCube.ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
-        flyTo('Home');
-      }}
-  nycCube.ongazeover = function(){}
-  nycCube.ongazeout = function(){timebuf = 0;}
-
-  sdCube.ongazelong = function(){
-      if(timebuf < 2) {timebuf++;}
-      else {
-        socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
-        flyTo('Home');
-      }}
-  sdCube.ongazeover = function(){}
-  sdCube.ongazeout = function(){timebuf = 0;}
-
-  // positioning and adding cubes to the scene
-  for (var i = 0; i < 6; i++) {
-      // Adding cube to reticle collider list
-      reticle.add_collider(cubes[i]);
-      // Position cube mesh
-      cubes[i].position.z = 5;
-      cubes[i].position.y = 0.5;
-      cubes[i].position.x = i * 3;
-
-      // Add cube mesh to your three.js scene
-      scene.add(cubes[i]);
-  }
-
-  reticle.add_collider(londonCube);
-  londonCube.position.x = -50;
-  londonCube.position.y = 0.5;
-  londonCube.position.z = -50;
-  scene.add(londonCube);
-
-  reticle.add_collider(parisCube);
-  parisCube.position.x = 0;
-  parisCube.position.y = 0.5;
-  parisCube.position.z = -50;
-  scene.add(parisCube);
-
-  reticle.add_collider(tokyoCube);
-  tokyoCube.position.x = 50;
-  tokyoCube.position.y = 0.5;
-  tokyoCube.position.z = -50;
-  scene.add(tokyoCube);
-
-  reticle.add_collider(turkeyCube);
-  turkeyCube.position.x = -50;
-  turkeyCube.position.y = 0.5;
-  turkeyCube.position.z = 50;
-  scene.add(turkeyCube);
-
-  reticle.add_collider(nycCube);
-  nycCube.position.x = 0;
-  nycCube.position.y = 0.5;
-  nycCube.position.z = 50;
-  scene.add(nycCube);
-
-  reticle.add_collider(sdCube);
-  sdCube.position.x = 50;
-  sdCube.position.y = 0.5;
-  sdCube.position.z = 50;
-  scene.add(sdCube);
-
-
+  initCityCubes();
 
   //Events------------------------------------------
   document.addEventListener('keydown', onKeyDown, false );
   document.addEventListener('keyup', onKeyUp, false );
 
 
-
-
-
-  function flyTo(_city) {
-    switch(_city) {
-      case 'Home':
-        player.position.x = 0;
-        player.position.z = 0;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      case 'London':
-        player.position.x = -47;
-        player.position.z = -47;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      case 'Paris':
-        player.position.x = 0;
-        player.position.z = -47;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      case 'Tokyo':
-        player.position.x = 47;
-        player.position.z = -47;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      case 'Turkey':
-        player.position.x = -47;
-        player.position.z = 47;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      case 'NYC':
-        player.position.x = 0;
-        player.position.z = 47;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      case 'SD':
-        player.position.x = 47;
-        player.position.z = 47;
-        updatePlayerData();
-        socket.emit('updatePosition', playerData);
-        break;
-      default:
-        break;
-    }
-  }
+  //--------------------------------------------------------------//
+  //---------------------- INIT LOCAL FUNCTIONS ------------------//
+  //--------------------------------------------------------------//
 
   function initSky() {
-
-          var tiempo;
-          function GetTime(latitude, longitude) {
-              $.ajax({
-                  url: 'http://api.geonames.org/timezoneJSON',
-                  data: {lat: latitude, lng: longitude, username: 'demo'},
-                  async: false,
-                  success: function(Response){
-                      //alert(Response.time + " in SD");
-                      //alert(Response.time + " in London");
-                      tiempo = Response.time[11] + Response.time[12];
-                      //alert(tiempo);
-                  },
-                  complete: function(){}
-              });
-          }
-
-          function getIlum() {
-              switch(tiempo) {
-
-                  case "12": return 0.3; break;
-                  case "11": case "13": return 0.4; break;
-                  case "10": case "14": return 0.5; break;
-                  case "09": case "15": return 0.6; break;
-                  case "08": case "16": return 0.7; break;
-                  case "07": case "17": return 0.8; break;
-                  case "06": case "18": return 0.9; break;
-                  case "05": case "19": return 1; break;
-                  case "04": case "20": return 1.1; break;
-                  case "21": case "22": case "23": case '00': case "01": case "02": case "03": return 0; break;
-                  default: return 1; break;
-              }
-          }
 
       // Add Sky Mesh
       sky = new THREE.Sky();
@@ -418,8 +113,8 @@ var loadWorld = function(){
 
       //GetTime(18.4709562, -69.9336103);// SD
       //GetTime(51.5287718, -0.2416806);// London
-      GetTime(51.5287718, -0.2416806);
-      var ilum = getIlum();
+      var tiempo = GetTimeFromAPI(51.5287718, -0.2416806);
+      var ilum = getIlum(tiempo);
       var effectController  = {
                   turbidity: 10,
                   reileigh: 2,
@@ -433,43 +128,267 @@ var loadWorld = function(){
 
       var distance = 400000;
 
-      function guiChanged() {
-
-          var uniforms = sky.uniforms;
-          uniforms.turbidity.value = effectController.turbidity;
-          uniforms.reileigh.value = effectController.reileigh;
-          uniforms.luminance.value = effectController.luminance;
-          uniforms.mieCoefficient.value = effectController.mieCoefficient;
-          uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
-
-          var theta = Math.PI * ( effectController.inclination - 0.5 );
-          var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
-
-          sunSphere.position.x = distance * Math.cos( phi );
-          sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-          sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
-
-          sunSphere.visible = effectController.sun;
-
-          sky.uniforms.sunPosition.value.copy( sunSphere.position );
-
-          renderer.render( scene, camera );
-
-      }
-
-      guiChanged();
+      guiChanged(effectController, distance);
   }
 
 
+  function initCityCubes() {
+
+    var cityCubeGeometry = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1);
+
+    var londonFaceMaterial = [];
+    var parisFaceMaterial = [];
+    var tokyoFaceMaterial = [];
+    var turkeyFaceMaterial = [];
+    var nycFaceMaterial = [];
+    var sdFaceMaterial = [];
+
+    // loading texture imgs and pushing them to arrays
+    londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln1.jpg')} )); //LONDON
+    londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln2.jpg')} ));
+    londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln3.png')} ));
+    londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln4.jpg')} ));
+    londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln5.jpg')} ));
+    londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln6.jpg')} ));
+
+    parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr2.png')} )); //PARIS
+    parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr5.jpg')} ));
+    parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
+    parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr1.png')} ));
+    parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr4.jpg')} ));
+    parisFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/fr/fr6.png')} ));
+
+    tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp1.jpg')} )); //TOKYO
+    tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp2.jpg')} ));
+    tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp3.png')} ));
+    tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp4.jpg')} ));
+    tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp5.jpg')} ));
+    tokyoFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/jp/jp6.png')} ));
+
+    turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk1.jpg')} )); //TURKEY
+    turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk2.jpg')} ));
+    turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk3.png')} ));
+    turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk4.jpg')} ));
+    turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk5.jpg')} ));
+    turkeyFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/tk/tk6.jpg')} ));
+
+    nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny1.jpg')} )); //NYC
+    nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny2.jpg')} ));
+    nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny3.png')} ));
+    nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny4.jpg')} ));
+    nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny5.jpg')} ));
+    nycFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ny/ny6.jpg')} ));
+
+    sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd4.png')} )); //SD
+    sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd7.png')} ));
+    sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd2.png')} ));
+    sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd1.png')} ));
+    sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd6.png')} ));
+    sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd5.png')} ));
+
+    // applying textures to cubes
+    londonCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( londonFaceMaterial ));
+    parisCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( parisFaceMaterial));
+    tokyoCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( tokyoFaceMaterial ));
+    turkeyCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( turkeyFaceMaterial ));
+    nycCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( nycFaceMaterial ));
+    sdCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( sdFaceMaterial ));
+
+    cube1 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( londonFaceMaterial ));
+    cube2 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( parisFaceMaterial ));
+    cube3 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( tokyoFaceMaterial ));
+    cube4 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( turkeyFaceMaterial ));
+    cube5 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( nycFaceMaterial ));
+    cube6 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( sdFaceMaterial ));
+
+    londonCube.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          socket.emit('lookingAtCube', 'London'); timebuf = 0;
+          flyTo('London');
+          lightIntensityChanged(0.7);
+        }}
+    londonCube.ongazeover = function(){}
+    londonCube.ongazeout = function(){timebuf = 0;}
+
+    parisCube.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
+          flyTo('Paris');
+          lightIntensityChanged(1);
+        }}
+    parisCube.ongazeover = function(){}
+    parisCube.ongazeout = function(){timebuf = 0;}
+
+    tokyoCube.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
+          flyTo('Tokyo');
+          lightIntensityChanged(0);
+        }}
+    tokyoCube.ongazeover = function(){}
+    tokyoCube.ongazeout = function(){timebuf = 0;}
+
+    turkeyCube.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
+          flyTo('Turkey');
+          lightIntensityChanged(0.5);
+        }}
+    turkeyCube.ongazeover = function(){}
+    turkeyCube.ongazeout = function(){timebuf = 0;}
+
+    nycCube.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
+          flyTo('NYC');
+          lightIntensityChanged(1.1);
+        }}
+    nycCube.ongazeover = function(){}
+    nycCube.ongazeout = function(){timebuf = 0;}
+
+    sdCube.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
+          flyTo('SD');
+          lightIntensityChanged(0.3);
+        }}
+    sdCube.ongazeover = function(){}
+    sdCube.ongazeout = function(){timebuf = 0;}
+
+    cube1.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          timebuf = 0;
+          flyTo('Home');
+        }}
+    cube1.ongazeover = function(){}
+    cube1.ongazeout = function(){timebuf = 0;}
+
+    cube2.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          timebuf = 0;
+          flyTo('Home');
+        }}
+    cube2.ongazeover = function(){}
+    cube2.ongazeout = function(){timebuf = 0;}
+
+    cube3.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          timebuf = 0;
+          flyTo('Home');
+        }}
+    cube3.ongazeover = function(){}
+    cube3.ongazeout = function(){timebuf = 0;}
+
+    cube4.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          timebuf = 0;
+          flyTo('Home');
+        }}
+    cube4.ongazeover = function(){}
+    cube4.ongazeout = function(){timebuf = 0;}
+
+    cube5.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          timebuf = 0;
+          flyTo('Home');
+        }}
+    cube5.ongazeover = function(){}
+    cube5.ongazeout = function(){timebuf = 0;}
+
+    cube6.ongazelong = function(){
+        if(timebuf < 2) {timebuf++;}
+        else {
+          timebuf = 0;
+          flyTo('Home');
+        }}
+    cube6.ongazeover = function(){}
+    cube6.ongazeout = function(){timebuf = 0;}
 
 
+    reticle.add_collider(londonCube);
+    londonCube.position.x = -5;
+    londonCube.position.y = 0.5;
+    londonCube.position.z = -3;
+    scene.add(londonCube);
 
+    reticle.add_collider(parisCube);
+    parisCube.position.x = 0;
+    parisCube.position.y = 0.5;
+    parisCube.position.z = -6;
+    scene.add(parisCube);
 
+    reticle.add_collider(tokyoCube);
+    tokyoCube.position.x = 5;
+    tokyoCube.position.y = 0.5;
+    tokyoCube.position.z = -3;
+    scene.add(tokyoCube);
 
+    reticle.add_collider(turkeyCube);
+    turkeyCube.position.x = 5;
+    turkeyCube.position.y = 0.5;
+    turkeyCube.position.z = 3;
+    scene.add(turkeyCube);
 
+    reticle.add_collider(nycCube);
+    nycCube.position.x = 0;
+    nycCube.position.y = 0.5;
+    nycCube.position.z = 6;
+    scene.add(nycCube);
 
+    reticle.add_collider(sdCube);
+    sdCube.position.x = -5;
+    sdCube.position.y = 0.5;
+    sdCube.position.z = 3;
+    scene.add(sdCube);
 
+    reticle.add_collider(cube1);
+    cube1.position.x = -50;
+    cube1.position.y = 0.5;
+    cube1.position.z = -50;
+    scene.add(cube1);
 
+    reticle.add_collider(cube2);
+    cube2.position.x = 0;
+    cube2.position.y = 0.5;
+    cube2.position.z = -50;
+    scene.add(cube2);
+
+    reticle.add_collider(cube3);
+    cube3.position.x = 50;
+    cube3.position.y = 0.5;
+    cube3.position.z = -50;
+    scene.add(cube3);
+
+    reticle.add_collider(cube4);
+    cube4.position.x = -50;
+    cube4.position.y = 0.5;
+    cube4.position.z = 50;
+    scene.add(cube4);
+
+    reticle.add_collider(cube5);
+    cube5.position.x = 0;
+    cube5.position.y = 0.5;
+    cube5.position.z = 50;
+    scene.add(cube5);
+
+    reticle.add_collider(cube6);
+    cube6.position.x = 50;
+    cube6.position.y = 0.5;
+    cube6.position.z = 50;
+    scene.add(cube6);
+
+  }
 
 
 
@@ -491,10 +410,13 @@ var loadWorld = function(){
   // Request animation frame loop function
   function animate() {
 
-    // Apply rotation to cube mesh
-    for (var cube_index = 0; cube_index < 6; cube_index++) {
-        cubes[cube_index].rotation.y += 0.02; //* (cube_index+1);
-    }
+    // Apply rotation to city cube mesh
+    londonCube.rotation.y += 0.02;
+    parisCube.rotation.y += 0.02;
+    tokyoCube.rotation.y += 0.02;
+    turkeyCube.rotation.y += 0.02;
+    nycCube.rotation.y += 0.02;
+    sdCube.rotation.y += 0.02;
 
     checkKeyStates();
     // Update VR headset position and apply to camera.
@@ -574,6 +496,129 @@ var loadWorld = function(){
 //---------------------- GLOBAL FUNCTIONS ----------------------//
 //--------------------------------------------------------------//
 
+var GetTimeFromAPI = function(latitude, longitude) {
+    var tiempo;
+    $.ajax({
+        url: 'http://api.geonames.org/timezoneJSON',
+        data: {lat: latitude, lng: longitude, username: 'demo'},
+        async: false,
+        success: function(Response){
+            //alert(Response.time + " in SD");
+            //alert(Response.time + " in London");
+            if(Response) {
+              tiempo = Response.time[11] + Response.time[12];
+            } else {tiempo = 1;}
+
+            //alert(tiempo);
+        },
+        complete: function(){}
+    });
+    return tiempo;
+};
+
+var getIlum = function(_tiempo) {
+    switch(_tiempo) {
+        case "12": return 0.3; break;
+        case "11": case "13": return 0.4; break;
+        case "10": case "14": return 0.5; break;
+        case "09": case "15": return 0.6; break;
+        case "08": case "16": return 0.7; break;
+        case "07": case "17": return 0.8; break;
+        case "06": case "18": return 0.9; break;
+        case "05": case "19": return 1; break;
+        case "04": case "20": return 1.1; break;
+        case "21": case "22": case "23": case '00': case "01": case "02": case "03": return 0; break;
+        default: return 1; break;
+    }
+};
+
+var guiChanged = function(effectController, distance) {
+
+    var uniforms = sky.uniforms;
+    uniforms.turbidity.value = effectController.turbidity;
+    uniforms.reileigh.value = effectController.reileigh;
+    uniforms.luminance.value = effectController.luminance;
+    uniforms.mieCoefficient.value = effectController.mieCoefficient;
+    uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+
+    var theta = Math.PI * ( effectController.inclination - 0.5 );
+    var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+
+    sunSphere.position.x = distance * Math.cos( phi );
+    sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
+    sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+
+    sunSphere.visible = effectController.sun;
+
+    sky.uniforms.sunPosition.value.copy( sunSphere.position );
+
+    renderer.render( scene, camera );
+
+};
+
+var lightIntensityChanged = function(_ilum) {
+    var effectController  = {
+              turbidity: 10,
+              reileigh: 2,
+              mieCoefficient: 0.005,
+              mieDirectionalG: 0.8,
+              luminance: _ilum,
+              inclination: 0.49, // elevation / inclination
+              azimuth: 0.25, // Facing front,
+              sun:  true
+          };
+    guiChanged(effectController, 400000);
+};
+
+var flyTo = function(_city) {
+  switch(_city) {
+    case 'Home':
+      player.position.x = 0;
+      player.position.z = 0;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    case 'London':
+      player.position.x = -47;
+      player.position.z = -47;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    case 'Paris':
+      player.position.x = 0;
+      player.position.z = -47;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    case 'Tokyo':
+      player.position.x = 47;
+      player.position.z = -47;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    case 'Turkey':
+      player.position.x = -47;
+      player.position.z = 47;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    case 'NYC':
+      player.position.x = 0;
+      player.position.z = 47;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    case 'SD':
+      player.position.x = 47;
+      player.position.z = 47;
+      updatePlayerData();
+      socket.emit('updatePosition', playerData);
+      break;
+    default:
+      break;
+  }
+};
+
 var createPlayer = function(data){
 
     playerData = data;
@@ -588,6 +633,11 @@ var createPlayer = function(data){
     player.position.x = data.x;
     player.position.y = data.y;
     player.position.z = data.z;
+
+    //position of control camera
+    cx = player.position.x;
+    cy = player.position.y + 3;
+    cz = player.position.z;
 
     playerId = data.playerId;
     moveSpeed = data.speed;
