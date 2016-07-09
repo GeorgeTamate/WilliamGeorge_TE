@@ -39,6 +39,34 @@ var playerData;
 var otherPlayers = [], otherPlayersId = [];
 
 
+var clock;
+
+// Particles
+var particles = new THREE.Object3D(),
+  totalParticles = 200,
+  maxParticleSize = 200,
+  particleRotationSpeed = 0,
+  particleRotationDeg = 0,
+  lastColorRange = [0, 0.3],
+  currentColorRange = [0, 0.3];
+  currentWeather = 'Clear';
+
+  //weather
+
+/*
+London 51.507351, -0.127758
+Paris 48.856614, 2.352222
+Tokyo 35.6895, 139.6917
+Turkey 38.963745, 35.243322
+NYC 40.712784, -74.005941
+SD 18.7357, -70.1627
+
+white 0xEBECEC
+Blue 0x1E82D6
+Gray 0x929495
+*/
+
+
 // Works as the main() in client_world.
 var loadWorld = function(){
 
@@ -219,7 +247,9 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'London'); timebuf = 0;
           flyTo('London');
-          adjustToWeatherConditions('London');
+          weatherChanged('London');
+          animateParticles();
+          //adjustToWeatherConditions('London');
           //applyWeatherConditions('London');
           lightIntensityChanged(0.7);
         }}
@@ -231,7 +261,9 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
           flyTo('Paris');
-          adjustToWeatherConditions('Paris');
+          weatherChanged('Paris');
+          animateParticles();
+          //adjustToWeatherConditions('Paris');
           //applyWeatherConditions('Paris');
           lightIntensityChanged(1);
         }}
@@ -243,7 +275,9 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
           flyTo('Tokyo');
-          adjustToWeatherConditions('Tokyo');
+          weatherChanged('Tokyo');
+          animateParticles();
+          //adjustToWeatherConditions('Tokyo');
           //applyWeatherConditions('Tokyo');
           lightIntensityChanged(0);
         }}
@@ -255,7 +289,9 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
           flyTo('Turkey');
-          adjustToWeatherConditions('Turkey');
+          weatherChanged('Turkey');
+          animateParticles();
+          //adjustToWeatherConditions('Turkey');
           //applyWeatherConditions('Turkey');
           lightIntensityChanged(0.5);
         }}
@@ -267,7 +303,9 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
           flyTo('NYC');
-          adjustToWeatherConditions('NewYork');
+          weatherChanged('NYC');
+          animateParticles();
+          //adjustToWeatherConditions('NewYork');
           //applyWeatherConditions('NewYork');
           lightIntensityChanged(1.1);
         }}
@@ -279,7 +317,9 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
           flyTo('SD');
-          adjustToWeatherConditions('SantoDomingo');
+          weatherChanged('SD');
+          animateParticles();
+          //adjustToWeatherConditions('SantoDomingo');
           //applyWeatherConditions('SantoDomingo');
           lightIntensityChanged(0.3);
         }}
@@ -419,16 +459,7 @@ var loadWorld = function(){
   //---------------------- PARTICLES ----------------------//
   //-------------------------------------------------------//
 
-  var clock;
 
-  // Particles
-  var particles = new THREE.Object3D(),
-    totalParticles = 200,
-    maxParticleSize = 200,
-    particleRotationSpeed = 0,
-    particleRotationDeg = 0,
-    lastColorRange = [0, 0.3],
-    currentColorRange = [0, 0.3],
 
   clock = new THREE.Clock();
 
@@ -693,6 +724,56 @@ var loadWorld = function(){
 //--------------------------------------------------------------//
 //---------------------- GLOBAL FUNCTIONS ----------------------//
 //--------------------------------------------------------------//
+var weatherChanged = function(_city) {
+  switch(_city) {
+    case 'London': callWeatherAPI(51.507351, -0.127758); break;
+    case 'Paris': callWeatherAPI(48.856614, 2.352222); break;
+    case 'Tokyo': callWeatherAPI(35.6895, 139.6917); break;
+    case 'Turkey': callWeatherAPI(38.963745, 35.243322); break;
+    case 'NYC': callWeatherAPI(40.712784, -74.005941); break;
+    case 'SD': callWeatherAPI(18.7357, -70.1627); break;
+    default: break;
+  }
+
+  function callWeatherAPI(_latitud, _longitud) {
+    $.ajax({
+        url: 'http://api.openweathermap.org/data/2.5/weather?',
+        data: {
+          lat:_latitud,
+          lon:_longitud,
+          appid:'90dd85c8ff64da0cd1d09fbc8ae06d81'},
+        success: function(Response){
+          console.log(Response.weather[0].main);
+          currentWeather = Response.weather[0].main;
+        }
+    });
+  }
+
+  switch(currentWeather) {
+    case 'Snow':
+      particles.visible = true;
+      currentColorRange = [0, 0.01];//white
+      break;
+    case 'Rain':
+      particles.visible = true;
+      currentColorRange = [0.69, 0.6];// tranparent violet blue
+      break;
+    case 'Clouds':
+      particles.visible = true;
+      currentColorRange = [0.7, 0.1];// semitrans lightgray
+      break;
+    case 'Mist':
+      particles.visible = true;
+      currentColorRange = [0.7, 0.1];// semitrans lightgray
+      break;
+    case 'Clear':
+      particles.visible = false;
+      break;
+    default:
+      break;
+  }
+};
+
 
 var GetTimeFromAPI = function(latitude, longitude) {
     var tiempo;
@@ -860,38 +941,38 @@ var flyTo = function(_city) {
       socket.emit('updatePosition', playerData);
       break;
     case 'London':
-      player.position.x = -47;
-      player.position.z = -47;
+      player.position.x = Math.random() * ((-43) - (-47)) + (-47);
+      player.position.z = Math.random() * ((-43) - (-47)) + (-47);
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'Paris':
-      player.position.x = 0;
-      player.position.z = -47;
+      player.position.x = Math.random() * 4;
+      player.position.z = Math.random() * ((-43) - (-47)) + (-47);
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'Tokyo':
-      player.position.x = 47;
-      player.position.z = -47;
+      player.position.x = Math.random() * (47 - 43) + 43;
+      player.position.z = Math.random() * ((-43) - (-47)) + (-47);
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'Turkey':
-      player.position.x = 47;
-      player.position.z = 47;
+      player.position.x = Math.random() * (47 - 43) + 43;
+      player.position.z = Math.random() * (47 - 43) + 43;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'NYC':
-      player.position.x = 0;
-      player.position.z = 47;
+      player.position.x = Math.random() * 4;
+      player.position.z = Math.random() * (47 - 43) + 43;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'SD':
-      player.position.x = -47;
-      player.position.z = 47;
+      player.position.x = Math.random() * ((-43) - (-47)) + (-47);
+      player.position.z = Math.random() * (47 - 43) + 43;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
