@@ -209,6 +209,8 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'London'); timebuf = 0;
           flyTo('London');
+          adjustToWeatherConditions('London');
+          //applyWeatherConditions('London');
           lightIntensityChanged(0.7);
         }}
     londonCube.ongazeover = function(){}
@@ -219,6 +221,8 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
           flyTo('Paris');
+          adjustToWeatherConditions('Paris');
+          //applyWeatherConditions('Paris');
           lightIntensityChanged(1);
         }}
     parisCube.ongazeover = function(){}
@@ -229,6 +233,8 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
           flyTo('Tokyo');
+          adjustToWeatherConditions('Tokyo');
+          //applyWeatherConditions('Tokyo');
           lightIntensityChanged(0);
         }}
     tokyoCube.ongazeover = function(){}
@@ -239,6 +245,8 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
           flyTo('Turkey');
+          adjustToWeatherConditions('Turkey');
+          //applyWeatherConditions('Turkey');
           lightIntensityChanged(0.5);
         }}
     turkeyCube.ongazeover = function(){}
@@ -249,6 +257,8 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
           flyTo('NYC');
+          adjustToWeatherConditions('NewYork');
+          //applyWeatherConditions('NewYork');
           lightIntensityChanged(1.1);
         }}
     nycCube.ongazeover = function(){}
@@ -259,6 +269,8 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
           flyTo('SD');
+          adjustToWeatherConditions('SantoDomingo');
+          //applyWeatherConditions('SantoDomingo');
           lightIntensityChanged(0.3);
         }}
     sdCube.ongazeover = function(){}
@@ -453,51 +465,78 @@ var loadWorld = function(){
   particles.position.y = 70;
   scene.add(particles);
 
+    //Funcion que solicita las condiciones climáticas y las actualiza.
+   function adjustToWeatherConditions(cityN) {
+      var cityIDs = cityN;
 
-   function adjustToWeatherConditions() {
-      var cityIDs = '';
-      for (var i = 0; i < cities.length; i++) {
-        cityIDs += cities[i][1];
-        if (i != cities.length - 1) cityIDs += ',';
-      }
-
-      // Replace with real API id.
-      getURL('http://api.openweathermap.org/data/2.5/group?id=' + cityIDs + '&APPID=b5c0b505a8746a1b2cc6b17cdab34535', function(info) {
+      getURL('http://api.openweathermap.org/data/2.5/group?id=' + cityIDs + '&APPID=90dd85c8ff64da0cd1d09fbc8ae06d81', function(info) {
         cityWeather = info.list;
 
-        lookupTimezones(0, cityWeather.length);
+        lookupTimezones();
       });
   }
 
-  function lookupTimezones(t, len) {
-      var tz = new TimeZoneDB;
+  //Funcion que busca las zonas horarias de los distintos lugares.
+  function lookupTimezones(cityN) {
+    /*var myUrl;
+    switch (cityN) {
 
-      tz.getJSON({
-          key: "GPH4A5Q6NGI1", // TODO: Use real key
-          lat: cityWeather[t].coord.lat,
-          lng: cityWeather[t].coord.lon
-      }, function(timeZone){
-          cityTimes.push(new Date(timeZone.timestamp * 1000));
-          t++;
-          if (t < len) {
-            setTimeout(function() {
-              lookupTimezones(t, len);
-            }, 1200);
-          } else {
-            applyWeatherConditions();
-          }
-      });
+      //If its london----------------------------------------------------------------
+      case 'London':
+     myUrl= 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=Europe/London';
+        break;
+
+        //If its New York------------------------------------------------------------
+        case 'NewYork':
+       myUrl= 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=America/NewYork';
+       break;
+
+            //If its Santo Domingo------------------------------------------------------------
+            case 'SantoDomingo':
+           myUrl= 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=America/SantoDomingo';
+           break;
+                //If its Turkey------------------------------------------------------------
+                case 'Turkey':
+               myUrl= 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=Asia/Turkey';
+               break;
+
+                    //If its Paris------------------------------------------------------------
+                    case 'Paris':
+                   myUrl= 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=Europe/Paris';
+
+                        break;
+      default:break;
+    }*/
+
+    $.ajax({
+      datatype: 'JSON',
+      url: 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=Europe/London',
+        success: function(Response){
+            console.log(Response);
+            var myDate = new Date(Response.timestamp*1100);
+            console.log(myDate);
+            var myhour= myDate.getHours();
+            console.log(myhour);
+          },
+          complete: function(){}
+
+
+
+           });
   }
 
-  function applyWeatherConditions() {
+  //Funcion que aplica las condiciones climáticas a las particulas.
+  function applyWeatherConditions(currentCity) {
 
       // TODO: Maybe display the city name here
 
-      var info = cityWeather[currentCity];
+      console.log(currentCity);
+
+      var info = currentCity;
       particleRotationSpeed = info.wind.speed / 2; // dividing by 2 just to slow things down
       particleRotationDeg = info.wind.deg;
 
-      var timeThere = cityTimes[currentCity] ? cityTimes[currentCity].getUTCHours() : 0,
+      var timeThere = currentCity ? currentCity.getUTCHours() : 0,
           isDay = timeThere >= 6 && timeThere <= 18;
 
       if (isDay) {
@@ -518,7 +557,7 @@ var loadWorld = function(){
         currentColorRange = [0.69, 0.6];
       }
 
-      if (currentCity < cities.length-1) currentCity++;
+      if (currentCity < 5) currentCity++;
       else currentCity = 0;
       setTimeout(applyWeatherConditions, 5000);
   }
