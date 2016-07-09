@@ -519,7 +519,8 @@ var loadWorld = function(){
 
   //Funcion que busca las zonas horarias de los distintos lugares.
   function lookupTimezones(cityN) {
-    /*var myUrl;
+    /*
+    var myUrl;
     switch (cityN) {
 
       //If its london----------------------------------------------------------------
@@ -547,11 +548,11 @@ var loadWorld = function(){
 
                         break;
       default:break;
-    }*/
-
+    }
+console.log(myUrl);
     $.ajax({
       datatype: 'JSON',
-      url: 'http://api.timezonedb.com/v2/get-time-zone?key=BGC297R9GDMR&format=json&by=zone&zone=Europe/London',
+      url: myUrl,
         success: function(Response){
             console.log(Response);
             var myDate = new Date(Response.timestamp*1100);
@@ -564,6 +565,7 @@ var loadWorld = function(){
 
 
            });
+           */
   }
 
   //Funcion que aplica las condiciones climáticas a las particulas.
@@ -616,6 +618,12 @@ var loadWorld = function(){
       }
 
       lastColorRange = currentColorRange;
+    }
+
+    if(particles.position.y >= -90) {
+      particles.position.y -= 0.1;
+    } else {
+      particles.position.y = 70;
     }
 
     //requestAnimationFrame(animate); // TODO: This will add the animations to the main loop, if you have it somewhere else just call animate
