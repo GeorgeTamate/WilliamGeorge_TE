@@ -16,9 +16,6 @@ var cz = 0;
 var reticle;
 var timebuf = 0;
 
-// Image Loader-----------------
-var loader;
-
 // Keyboard Elements-----------------
 var keyState = {};
 
@@ -26,12 +23,15 @@ var keyState = {};
 var plane;
 var sky, sunSphere;
 var sphere;
-var currentCityTextMesh;
 
 // City Cubes------------------
 var cube;
 var londonCube, parisCube, tokyoCube, turkeyCube, nycCube, sdCube;
 var cube1, cube2, cube3, cube4, cube5, cube6;
+
+// City Text------------------
+//var currentCityTextMesh;
+var londonText, parisText, tokyoText, turkeyText, nycText, sdText;
 
 // Players------------------
 var player, playerId, moveSpeed, turnSpeed;
@@ -62,8 +62,6 @@ var loadWorld = function(){
   // Apply VR stereo rendering to renderer.
   effect = new THREE.VREffect(renderer);
   effect.setSize(window.innerWidth, window.innerHeight);
-  // img loader
-  loader = new THREE.TextureLoader();
   // reticle
   reticle = vreticle.Reticle(camera);
   scene.add(camera);
@@ -86,7 +84,8 @@ var loadWorld = function(){
   //Cubes------------------
   initCityCubes();
 
-  //displayCurrentCityName('LONDON');
+  //Text------------------
+  displayCurrentCityName();
 
   //Events------------------------------------------
   document.addEventListener('keydown', onKeyDown, false );
@@ -145,6 +144,10 @@ var loadWorld = function(){
     var turkeyFaceMaterial = [];
     var nycFaceMaterial = [];
     var sdFaceMaterial = [];
+    var backFaceMaterial = [];
+
+    // img loader
+    var loader = new THREE.TextureLoader();
 
     // loading texture imgs and pushing them to arrays
     londonFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/ln/ln1.jpg')} )); //LONDON
@@ -189,6 +192,13 @@ var loadWorld = function(){
     sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd6.png')} ));
     sdFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/sd/sd5.png')} ));
 
+    backFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/back_box.png')} ));
+    backFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/back_box.png')} ));
+    backFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/back_box.png')} ));
+    backFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/back_box.png')} ));
+    backFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/back_box.png')} ));
+    backFaceMaterial.push(new THREE.MeshBasicMaterial( { map: loader.load('img/back_box.png')} ));
+
     // applying textures to cubes
     londonCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( londonFaceMaterial ));
     parisCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( parisFaceMaterial));
@@ -197,12 +207,12 @@ var loadWorld = function(){
     nycCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( nycFaceMaterial ));
     sdCube = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( sdFaceMaterial ));
 
-    cube1 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( londonFaceMaterial ));
-    cube2 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( parisFaceMaterial ));
-    cube3 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( tokyoFaceMaterial ));
-    cube4 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( turkeyFaceMaterial ));
-    cube5 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( nycFaceMaterial ));
-    cube6 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( sdFaceMaterial ));
+    cube1 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( backFaceMaterial ));
+    cube2 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( backFaceMaterial ));
+    cube3 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( backFaceMaterial ));
+    cube4 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( backFaceMaterial ));
+    cube5 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( backFaceMaterial ));
+    cube6 = new THREE.Mesh(cityCubeGeometry, new THREE.MeshFaceMaterial( backFaceMaterial ));
 
     londonCube.ongazelong = function(){
         if(timebuf < 2) {timebuf++;}
@@ -386,7 +396,7 @@ var loadWorld = function(){
     scene.add(cube3);
 
     reticle.add_collider(cube4);
-    cube4.position.x = -50;
+    cube4.position.x = 50;
     cube4.position.y = 0.5;
     cube4.position.z = 50;
     scene.add(cube4);
@@ -398,7 +408,7 @@ var loadWorld = function(){
     scene.add(cube5);
 
     reticle.add_collider(cube6);
-    cube6.position.x = 50;
+    cube6.position.x = -50;
     cube6.position.y = 0.5;
     cube6.position.z = 50;
     scene.add(cube6);
@@ -758,20 +768,87 @@ var lightIntensityChanged = function(_ilum) {
     guiChanged(effectController, 400000);
 };
 
-var displayCurrentCityName = function(name) {
-    //scene.remove(currentCityTextMesh);
-    var currentCityText = new THREE.TextGeometry(name, {
-      size: 4,
-      height: 1
-    });
-    currentCityTextMesh = new THREE.Mesh(currentCityText, new THREE.MeshBasicMaterial({
-      color: 0xffffff, opacity: 1
-    }));
-    currentCityTextMesh.position.y = 10;
-    currentCityTextMesh.position.z = 20;
+var displayCurrentCityName = function() {
+  //scene.remove(currentCityTextMesh);
+  var txmat = new THREE.MeshBasicMaterial({color: 0xaaaaaa,opacity: 1});
+  var txloader = new THREE.FontLoader();
+
+    txloader.load( '../fonts/helvetiker_regular.typeface.js', function ( _font ) {
+
+    /*
+    var currentCityText = new THREE.TextGeometry('gg',
+    {font: _font, size: 1,height: 0.5});
+    */
+    var londongeo = new THREE.TextGeometry('LONDON',
+    {font: _font, size: 1,height: 0.1});
+    var parisgeo = new THREE.TextGeometry('PARIS',
+    {font: _font, size: 1,height: 0.1});
+    var tokyogeo = new THREE.TextGeometry('TOKYO',
+    {font: _font, size: 1,height: 0.1});
+    var turkeygeo = new THREE.TextGeometry('TURKEY',
+    {font: _font, size: 1,height: 0.1});
+    var nycgeo = new THREE.TextGeometry('New York City',
+    {font: _font, size: 1,height: 0.1});
+    var sdgeo = new THREE.TextGeometry('Santo Domingo',
+    {font: _font, size: 1,height: 0.1});
+    /*
+    currentCityTextMesh = new THREE.Mesh(currentCityText,txmat);
+    currentCityTextMesh.position.y = 4;
+    currentCityTextMesh.position.z = -12;
     currentCityTextMesh.rotation.x = 0;
-    currentCityTextMesh.rotation.y = -180;
+    currentCityTextMesh.rotation.y = Math.PI;
     scene.add(currentCityTextMesh);
+    */
+    londonText = new THREE.Mesh(londongeo, txmat);
+    londonText.position.x = -50;
+    londonText.position.y = 2;
+    londonText.position.z = -50;
+    londonText.rotation.x = 0;
+    londonText.rotation.y = Math.PI/4;
+    scene.add(londonText);
+
+    parisText = new THREE.Mesh(parisgeo, txmat);
+    parisText.position.x = 0;
+    parisText.position.y = 2;
+    parisText.position.z = -50;
+    parisText.rotation.x = 0;
+    parisText.rotation.y = 0;
+    scene.add(parisText);
+
+    tokyoText = new THREE.Mesh(tokyogeo, txmat);
+    tokyoText.position.x = 50;
+    tokyoText.position.y = 2;
+    tokyoText.position.z = -50;
+    tokyoText.rotation.x = 0;
+    tokyoText.rotation.y = 7*Math.PI/4;
+    scene.add(tokyoText);
+
+    turkeyText = new THREE.Mesh(turkeygeo, txmat);
+    turkeyText.position.x = 50;
+    turkeyText.position.y = 2;
+    turkeyText.position.z = 50;
+    turkeyText.rotation.x = 0;
+    turkeyText.rotation.y = 5*Math.PI/4;
+    scene.add(turkeyText);
+
+    nycText = new THREE.Mesh(nycgeo, txmat);
+    nycText.position.x = 0
+    nycText.position.y = 2;
+    nycText.position.z = 50;
+    nycText.rotation.x = 0;
+    nycText.rotation.y = Math.PI;
+    scene.add(nycText);
+
+    sdText = new THREE.Mesh(sdgeo, txmat);
+    sdText.position.x = -50
+    sdText.position.y = 2;
+    sdText.position.z = 50;
+    sdText.rotation.x = 0;
+    sdText.rotation.y = 3*Math.PI/4;
+    scene.add(sdText);
+
+    } );
+
 };
 
 var flyTo = function(_city) {
@@ -801,7 +878,7 @@ var flyTo = function(_city) {
       socket.emit('updatePosition', playerData);
       break;
     case 'Turkey':
-      player.position.x = -47;
+      player.position.x = 47;
       player.position.z = 47;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
@@ -813,7 +890,7 @@ var flyTo = function(_city) {
       socket.emit('updatePosition', playerData);
       break;
     case 'SD':
-      player.position.x = 47;
+      player.position.x = -47;
       player.position.z = 47;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
