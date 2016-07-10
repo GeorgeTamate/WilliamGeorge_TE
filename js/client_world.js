@@ -141,16 +141,12 @@ var loadWorld = function(){
 
       // GUI
 
-      //GetTime(18.4709562, -69.9336103);// SD
-      //GetTime(51.5287718, -0.2416806);// London
-      var tiempo = GetTimeFromAPI(51.5287718, -0.2416806);
-      var ilum = getIlum(tiempo);
       var effectController  = {
                   turbidity: 10,
                   reileigh: 2,
                   mieCoefficient: 0.005,
                   mieDirectionalG: 0.8,
-                  luminance: ilum,
+                  luminance: 0.7,
                   inclination: 0.49, // elevation / inclination
                   azimuth: 0.25, // Facing front,
                   sun:  true
@@ -248,10 +244,7 @@ var loadWorld = function(){
           socket.emit('lookingAtCube', 'London'); timebuf = 0;
           flyTo('London');
           weatherChanged('London');
-          animateParticles();
-          //adjustToWeatherConditions('London');
-          //applyWeatherConditions('London');
-          lightIntensityChanged(0.7);
+          callTimeAPI(51.507351, -0.127758);
         }}
     londonCube.ongazeover = function(){}
     londonCube.ongazeout = function(){timebuf = 0;}
@@ -262,10 +255,7 @@ var loadWorld = function(){
           socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
           flyTo('Paris');
           weatherChanged('Paris');
-          animateParticles();
-          //adjustToWeatherConditions('Paris');
-          //applyWeatherConditions('Paris');
-          lightIntensityChanged(1);
+          callTimeAPI(48.856614, 2.352222);
         }}
     parisCube.ongazeover = function(){}
     parisCube.ongazeout = function(){timebuf = 0;}
@@ -276,10 +266,7 @@ var loadWorld = function(){
           socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
           flyTo('Tokyo');
           weatherChanged('Tokyo');
-          animateParticles();
-          //adjustToWeatherConditions('Tokyo');
-          //applyWeatherConditions('Tokyo');
-          lightIntensityChanged(0);
+          callTimeAPI(35.6895, 139.6917);
         }}
     tokyoCube.ongazeover = function(){}
     tokyoCube.ongazeout = function(){timebuf = 0;}
@@ -290,10 +277,7 @@ var loadWorld = function(){
           socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
           flyTo('Turkey');
           weatherChanged('Turkey');
-          animateParticles();
-          //adjustToWeatherConditions('Turkey');
-          //applyWeatherConditions('Turkey');
-          lightIntensityChanged(0.5);
+          callTimeAPI(38.963745, 35.243322);
         }}
     turkeyCube.ongazeover = function(){}
     turkeyCube.ongazeout = function(){timebuf = 0;}
@@ -304,10 +288,7 @@ var loadWorld = function(){
           socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
           flyTo('NYC');
           weatherChanged('NYC');
-          animateParticles();
-          //adjustToWeatherConditions('NewYork');
-          //applyWeatherConditions('NewYork');
-          lightIntensityChanged(1.1);
+          callTimeAPI(40.712784, -74.005941);
         }}
     nycCube.ongazeover = function(){}
     nycCube.ongazeout = function(){timebuf = 0;}
@@ -318,10 +299,7 @@ var loadWorld = function(){
           socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
           flyTo('SD');
           weatherChanged('SD');
-          animateParticles();
-          //adjustToWeatherConditions('SantoDomingo');
-          //applyWeatherConditions('SantoDomingo');
-          lightIntensityChanged(0.3);
+          callTimeAPI(18.7357, -70.1627);
         }}
     sdCube.ongazeover = function(){}
     sdCube.ongazeout = function(){timebuf = 0;}
@@ -462,13 +440,13 @@ var loadWorld = function(){
 
 
   clock = new THREE.Clock();
-
+/*
   currentColorRange = [0.7, 0.1];// semitrans lightgray
   currentColorRange = [0, 0.01];//white
   currentColorRange = [0.69, 0.6];// tranparent violet blue
   currentColorRange = [0.6, 0.7];//bright blue
   currentColorRange = [0, 0.7];
-
+*/
 
 
   function getURL(url, callback) {
@@ -732,6 +710,41 @@ console.log(myUrl);
 //--------------------------------------------------------------//
 //---------------------- GLOBAL FUNCTIONS ----------------------//
 //--------------------------------------------------------------//
+var callTimeAPI = function(_latitud, _longitud) {
+  $.ajax({
+     url: 'http://api.timezonedb.com/v2/get-time-zone',
+     data: {
+       key:'BGC297R9GDMR',
+       format:'json',
+       by:'position',
+       lat:_latitud,
+       lng:_longitud},
+     success: function(Response){
+
+       // Create a new JavaScript Date object based on the timestamp
+       // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+       var date = new Date(Response.timestamp * 1000);
+       // Hours part from the timestamp
+       var hours = date.getHours() + 4;
+       // Minutes part from the timestamp
+       var minutes = "0" + date.getMinutes();
+       // Seconds part from the timestamp
+       var seconds = "0" + date.getSeconds();
+
+       // Do not let it go over 23
+       if(hours >= 24) {hours -= 24;}
+       // Will display time in 10:30:23 format
+       var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+       console.log(formattedTime);
+
+       var ilumination = getIlum(hours);
+       lightIntensityChanged(ilumination);
+
+     }
+    });
+};
+
 var weatherChanged = function(_city) {
   switch(_city) {
     case 'London': callWeatherAPI(51.507351, -0.127758); break;
@@ -782,39 +795,18 @@ var weatherChanged = function(_city) {
   }
 };
 
-
-var GetTimeFromAPI = function(latitude, longitude) {
-    var tiempo;
-    $.ajax({
-        url: 'http://api.geonames.org/timezoneJSON',
-        data: {lat: latitude, lng: longitude, username: 'demo'},
-        async: false,
-        success: function(Response){
-            //alert(Response.time + " in SD");
-            //alert(Response.time + " in London");
-            if(Response) {
-              tiempo = Response.time[11] + Response.time[12];
-            } else {tiempo = 1;}
-
-            //alert(tiempo);
-        },
-        complete: function(){}
-    });
-    return tiempo;
-};
-
 var getIlum = function(_tiempo) {
     switch(_tiempo) {
-        case "12": return 0.3; break;
-        case "11": case "13": return 0.4; break;
-        case "10": case "14": return 0.5; break;
-        case "09": case "15": return 0.6; break;
-        case "08": case "16": return 0.7; break;
-        case "07": case "17": return 0.8; break;
-        case "06": case "18": return 0.9; break;
-        case "05": case "19": return 1; break;
-        case "04": case "20": return 1.1; break;
-        case "21": case "22": case "23": case '00': case "01": case "02": case "03": return 0; break;
+        case 12: return 0.3; break;
+        case 11: case 13: return 0.4; break;
+        case 10: case 14: return 0.5; break;
+        case 9: case 15: return 0.6; break;
+        case 8: case 16: return 0.7; break;
+        case 7: case 17: return 0.8; break;
+        case 6: case 18: return 0.9; break;
+        case 5: case 19: return 1; break;
+        case 4: case 20: return 1.1; break;
+        case 21: case 22: case 23: case 0: case 1: case 2: case 3: return 0; break;
         default: return 1; break;
     }
 };
@@ -949,38 +941,38 @@ var flyTo = function(_city) {
       socket.emit('updatePosition', playerData);
       break;
     case 'London':
-      player.position.x = Math.random() * ((-43) - (-47)) + (-47);
-      player.position.z = Math.random() * ((-43) - (-47)) + (-47);
+      player.position.x = Math.random() * ((-41) - (-47)) + (-47);
+      player.position.z = Math.random() * ((-41) - (-47)) + (-47);
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'Paris':
-      player.position.x = Math.random() * 4;
-      player.position.z = Math.random() * ((-43) - (-47)) + (-47);
+      player.position.x = Math.random() * 6;
+      player.position.z = Math.random() * ((-41) - (-47)) + (-47);
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'Tokyo':
-      player.position.x = Math.random() * (47 - 43) + 43;
-      player.position.z = Math.random() * ((-43) - (-47)) + (-47);
+      player.position.x = Math.random() * (47 - 41) + 41;
+      player.position.z = Math.random() * ((-41) - (-47)) + (-47);
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'Turkey':
-      player.position.x = Math.random() * (47 - 43) + 43;
-      player.position.z = Math.random() * (47 - 43) + 43;
+      player.position.x = Math.random() * (47 - 41) + 41;
+      player.position.z = Math.random() * (47 - 41) + 41;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'NYC':
-      player.position.x = Math.random() * 4;
-      player.position.z = Math.random() * (47 - 43) + 43;
+      player.position.x = Math.random() * 6;
+      player.position.z = Math.random() * (47 - 41) + 41;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
     case 'SD':
-      player.position.x = Math.random() * ((-43) - (-47)) + (-47);
-      player.position.z = Math.random() * (47 - 43) + 43;
+      player.position.x = Math.random() * ((-41) - (-47)) + (-47);
+      player.position.z = Math.random() * (47 - 41) + 41;
       updatePlayerData();
       socket.emit('updatePosition', playerData);
       break;
