@@ -51,6 +51,7 @@ var particles = new THREE.Object3D(),
   currentColorRange = [0, 0.3];
   currentWeather = 'Clear';
 
+var particleTexture, spriteMaterial;
   //weather
 
 /*
@@ -243,7 +244,7 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'London'); timebuf = 0;
           flyTo('London');
-          weatherChanged('London');
+          callWeatherAPI(51.507351, -0.127758);
           callTimeAPI(51.507351, -0.127758);
         }}
     londonCube.ongazeover = function(){}
@@ -254,7 +255,7 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Paris'); timebuf = 0;
           flyTo('Paris');
-          weatherChanged('Paris');
+          callWeatherAPI(48.856614, 2.352222);
           callTimeAPI(48.856614, 2.352222);
         }}
     parisCube.ongazeover = function(){}
@@ -265,7 +266,7 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Tokyo'); timebuf = 0;
           flyTo('Tokyo');
-          weatherChanged('Tokyo');
+          callWeatherAPI(35.6895, 139.6917);
           callTimeAPI(35.6895, 139.6917);
         }}
     tokyoCube.ongazeover = function(){}
@@ -276,7 +277,7 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Turkey'); timebuf = 0;
           flyTo('Turkey');
-          weatherChanged('Turkey');
+          callWeatherAPI(38.963745, 35.243322);
           callTimeAPI(38.963745, 35.243322);
         }}
     turkeyCube.ongazeover = function(){}
@@ -287,7 +288,7 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'NYC'); timebuf = 0;
           flyTo('NYC');
-          weatherChanged('NYC');
+          callWeatherAPI(40.712784, -74.005941);
           callTimeAPI(40.712784, -74.005941);
         }}
     nycCube.ongazeover = function(){}
@@ -298,7 +299,7 @@ var loadWorld = function(){
         else {
           socket.emit('lookingAtCube', 'Santo Domingo'); timebuf = 0;
           flyTo('SD');
-          weatherChanged('SD');
+          callWeatherAPI(18.7357, -70.1627);
           callTimeAPI(18.7357, -70.1627);
         }}
     sdCube.ongazeover = function(){}
@@ -465,7 +466,7 @@ var loadWorld = function(){
     xmlhttp.send();
   }
 
-  var particleTexture = THREE.ImageUtils.loadTexture('textures/particle.png'),
+    particleTexture = THREE.ImageUtils.loadTexture('textures/particle.png'),
     spriteMaterial = new THREE.SpriteMaterial({
     map: particleTexture,
     color: 0xffffff
@@ -483,6 +484,7 @@ var loadWorld = function(){
 
   particles.position.y = 70;
   scene.add(particles);
+  particles.visible = false;
 
     //Funcion que solicita las condiciones climáticas y las actualiza.
    function adjustToWeatherConditions(cityN) {
@@ -745,18 +747,7 @@ var callTimeAPI = function(_latitud, _longitud) {
     });
 };
 
-var weatherChanged = function(_city) {
-  switch(_city) {
-    case 'London': callWeatherAPI(51.507351, -0.127758); break;
-    case 'Paris': callWeatherAPI(48.856614, 2.352222); break;
-    case 'Tokyo': callWeatherAPI(35.6895, 139.6917); break;
-    case 'Turkey': callWeatherAPI(38.963745, 35.243322); break;
-    case 'NYC': callWeatherAPI(40.712784, -74.005941); break;
-    case 'SD': callWeatherAPI(18.7357, -70.1627); break;
-    default: break;
-  }
-
-  function callWeatherAPI(_latitud, _longitud) {
+var callWeatherAPI = function(_latitud, _longitud) {
     $.ajax({
         url: 'http://api.openweathermap.org/data/2.5/weather?',
         data: {
@@ -766,33 +757,37 @@ var weatherChanged = function(_city) {
         success: function(Response){
           console.log(Response.weather[0].main);
           currentWeather = Response.weather[0].main;
+          //
+          scene.remove(particles);
+          particles = new THREE.Object3D();
+          var weatherpallet;
+          switch(currentWeather) {
+            case 'Snow': weatherpallet = 0xEBECEC; particles.visible = true; break;
+            case 'Rain': weatherpallet = 0x1E82D6; particles.visible = true; break;
+            case 'Clouds': weatherpallet = 0x525252; particles.visible = true; break;
+            case 'Mist': weatherpallet = 0x525252; particles.visible = true; break;
+            case 'Clear': weatherpallet = 0xEBECEC; particles.visible = false; break;
+            default: weatherpallet = 0x1E82D6; break;
+          }
+          particleTexture = new THREE.ImageUtils.loadTexture('textures/particle.png'),
+            spriteMaterial = new THREE.SpriteMaterial({
+              map: particleTexture,
+              color: weatherpallet
+          });
+          for (var i = 0; i < totalParticles; i++) {
+            var sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(64, 64, 1.0);
+            sprite.position.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.75);
+            sprite.position.setLength(maxParticleSize * Math.random());
+            sprite.material.blending = THREE.AdditiveBlending;
+
+            particles.add(sprite);
+          }
+
+          particles.position.y = 70;
+          scene.add(particles);
         }
     });
-  }
-
-  switch(currentWeather) {
-    case 'Snow':
-      particles.visible = true;
-      currentColorRange = [0, 0.01];//white
-      break;
-    case 'Rain':
-      particles.visible = true;
-      currentColorRange = [0.69, 0.6];// tranparent violet blue
-      break;
-    case 'Clouds':
-      particles.visible = true;
-      currentColorRange = [0.7, 0.1];// semitrans lightgray
-      break;
-    case 'Mist':
-      particles.visible = true;
-      currentColorRange = [0.7, 0.1];// semitrans lightgray
-      break;
-    case 'Clear':
-      particles.visible = false;
-      break;
-    default:
-      break;
-  }
 };
 
 var getIlum = function(_tiempo) {
